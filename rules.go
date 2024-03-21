@@ -21,7 +21,7 @@ type Rule struct {
 	Type                              string    `json:"type"`
 	VerificationMethods               []string  `json:"verificationMethods"`
 	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods"`
-	DefaultVerificationMethod         []string  `json:"defaultVerificationMethod"`
+	DefaultVerificationMethod         string    `json:"defaultVerificationMethod"`
 	Conditions                        Condition `json:"conditions"`
 }
 
