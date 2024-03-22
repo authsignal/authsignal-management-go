@@ -15,9 +15,11 @@ type Client struct {
 }
 
 type HttpStatusResponse struct {
-	Success    bool
-	StatusCode int64
-	Message    string
+	Success          bool
+	StatusCode       int64
+	Message          string
+	Error            string
+	ErrorDescription string
 }
 
 func NewClient(host string, tenantId string, apiSecret string) Client {

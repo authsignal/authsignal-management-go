@@ -7,22 +7,22 @@ import (
 	"net/http"
 )
 
-type Condition struct {
+type Condition interface {
 }
 
 type Rule struct {
-	Name                              string    `json:"name"`
-	Description                       string    `json:"description"`
+	Name                              string    `json:"name,omitempty"`
+	Description                       string    `json:"description,omitempty"`
 	IsActive                          bool      `json:"isActive"`
 	Priority                          int32     `json:"priority"`
-	ActionCode                        string    `json:"actionCode"`
-	RuleId                            string    `json:"ruleId"`
-	TenantId                          string    `json:"tenantId"`
-	Type                              string    `json:"type"`
-	VerificationMethods               []string  `json:"verificationMethods"`
-	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods"`
-	DefaultVerificationMethod         string    `json:"defaultVerificationMethod"`
-	Conditions                        Condition `json:"conditions"`
+	ActionCode                        string    `json:"actionCode,omitempty"`
+	RuleId                            string    `json:"ruleId,omitempty"`
+	TenantId                          string    `json:"tenantId,omitempty"`
+	Type                              string    `json:"type,omitempty"`
+	VerificationMethods               []string  `json:"verificationMethods,omitempty"`
+	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods,omitempty"`
+	DefaultVerificationMethod         string    `json:"defaultVerificationMethod,omitempty"`
+	Conditions                        Condition `json:"conditions,omitempty"`
 }
 
 func (c Client) CreateRule(actionCode string, rule Rule) (*Rule, error) {
@@ -72,13 +72,13 @@ func (c Client) GetRule(actionCode string, ruleId string) (*Rule, error) {
 	return &rule, nil
 }
 
-func (c Client) UpdateRule(actionCode string, rule Rule) (*Rule, error) {
+func (c Client) UpdateRule(actionCode string, ruleId string, rule Rule) (*Rule, error) {
 	updateBody, err := json.Marshal(rule)
 	if err != nil {
 		return nil, err
 	}
 
-	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/action-configurations/%s/rules/%s", c.Host, actionCode, rule.RuleId), bytes.NewReader(updateBody))
+	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/action-configurations/%s/rules/%s", c.Host, actionCode, ruleId), bytes.NewReader(updateBody))
 	if err != nil {
 		return nil, err
 	}

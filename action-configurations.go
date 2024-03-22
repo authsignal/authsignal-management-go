@@ -61,13 +61,13 @@ func (c Client) GetActionConfiguration(actionCode string) (*ActionConfiguration,
 	return &actionConfiguration, nil
 }
 
-func (c Client) UpdateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfiguration, error) {
+func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration ActionConfiguration) (*ActionConfiguration, error) {
 	updateBody, err := json.Marshal(actionConfiguration)
 	if err != nil {
 		return nil, err
 	}
 
-	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionConfiguration.ActionCode), bytes.NewReader(updateBody))
+	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), bytes.NewReader(updateBody))
 	if err != nil {
 		return nil, err
 	}
