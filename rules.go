@@ -14,7 +14,7 @@ type Rule struct {
 	Name                              string    `json:"name,omitempty"`
 	Description                       string    `json:"description,omitempty"`
 	IsActive                          bool      `json:"isActive"`
-	Priority                          int32     `json:"priority"`
+	Priority                          int64     `json:"priority"`
 	ActionCode                        string    `json:"actionCode,omitempty"`
 	RuleId                            string    `json:"ruleId,omitempty"`
 	TenantId                          string    `json:"tenantId,omitempty"`
@@ -31,7 +31,7 @@ func (c Client) CreateRule(actionCode string, rule Rule) (*Rule, error) {
 		return nil, err
 	}
 
-	request, err := http.NewRequest("POST", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), bytes.NewReader(createBody))
+	request, err := http.NewRequest("POST", fmt.Sprintf("%s/action-configurations/%s/rules", c.Host, actionCode), bytes.NewReader(createBody))
 	if err != nil {
 		return nil, err
 	}
