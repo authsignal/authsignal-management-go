@@ -53,7 +53,7 @@ func (c Client) makeRequest(request *http.Request, apiSecret string) ([]byte, er
 	if response.StatusCode > 299 {
 		var responseBodyToPrint HttpStatusResponse
 		json.Unmarshal(responseBody, &responseBodyToPrint)
-		return nil, fmt.Errorf("bad request to %s, http status code of %d, status was: %s, body was: %+v", request.URL, response.StatusCode, response.Status, responseBodyToPrint)
+		return nil, fmt.Errorf("request to %s failed.\n    status: %s\n    error: %s\n    error description: %s", request.URL, response.Status, responseBodyToPrint.Error, responseBodyToPrint.ErrorDescription)
 	}
 
 	return responseBody, nil
