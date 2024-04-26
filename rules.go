@@ -13,8 +13,8 @@ type Condition interface {
 type Rule struct {
 	Name                              string    `json:"name,omitempty"`
 	Description                       string    `json:"description,omitempty"`
-	IsActive                          bool      `json:"isActive"`
-	Priority                          int64     `json:"priority"`
+	IsActive                          bool      `json:"isActive,omitempty"`
+	Priority                          int64     `json:"priority,omitempty"`
 	ActionCode                        string    `json:"actionCode,omitempty"`
 	RuleId                            string    `json:"ruleId,omitempty"`
 	TenantId                          string    `json:"tenantId,omitempty"`
