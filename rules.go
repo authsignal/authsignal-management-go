@@ -11,21 +11,34 @@ type Condition interface {
 }
 
 type Rule struct {
-	Name                              string    `json:"name,omitempty"`
-	Description                       string    `json:"description,omitempty"`
-	IsActive                          bool      `json:"isActive,omitempty"`
-	Priority                          int64     `json:"priority,omitempty"`
-	ActionCode                        string    `json:"actionCode,omitempty"`
-	RuleId                            string    `json:"ruleId,omitempty"`
-	TenantId                          string    `json:"tenantId,omitempty"`
-	Type                              string    `json:"type,omitempty"`
-	VerificationMethods               []string  `json:"verificationMethods,omitempty"`
-	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods,omitempty"`
-	DefaultVerificationMethod         string    `json:"defaultVerificationMethod,omitempty"`
-	Conditions                        Condition `json:"conditions,omitempty"`
+	Name                              NullableJsonInput[string]    `json:"name,omitempty"`
+	Description                       NullableJsonInput[string]    `json:"description,omitempty"`
+	IsActive                          NullableJsonInput[bool]      `json:"isActive,omitempty"`
+	Priority                          NullableJsonInput[int64]     `json:"priority,omitempty"`
+	Type                              NullableJsonInput[string]    `json:"type,omitempty"`
+	VerificationMethods               NullableJsonInput[[]string]  `json:"verificationMethods,omitempty"`
+	PromptToEnrollVerificationMethods NullableJsonInput[[]string]  `json:"promptToEnrollVerificationMethods,omitempty"`
+	DefaultVerificationMethod         NullableJsonInput[string]    `json:"defaultVerificationMethod,omitempty"`
+	Conditions                        NullableJsonInput[Condition] `json:"conditions,omitempty"`
 }
 
-func (c Client) CreateRule(actionCode string, rule Rule) (*Rule, error) {
+type RuleResponse struct {
+	Name                              string    `json:"name"`
+	Description                       string    `json:"description"`
+	IsActive                          bool      `json:"isActive"`
+	Priority                          int64     `json:"priority"`
+	ActionCode                        string    `json:"actionCode"`
+	RuleId                            string    `json:"ruleId"`
+	TenantId                          string    `json:"tenantId"`
+	Type                              string    `json:"type"`
+	VerificationMethods               []string  `json:"verificationMethods"`
+	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods"`
+	DefaultVerificationMethod         string    `json:"defaultVerificationMethod"`
+	Conditions                        Condition `json:"conditions"`
+}
+
+func (c Client) CreateRule(actionCode string, rule Rule) (*RuleResponse, error) {
+
 	createBody, err := json.Marshal(rule)
 	if err != nil {
 		return nil, err
@@ -43,7 +56,7 @@ func (c Client) CreateRule(actionCode string, rule Rule) (*Rule, error) {
 		return nil, err
 	}
 
-	var createdRule Rule
+	var createdRule RuleResponse
 	err = json.Unmarshal(body, &createdRule)
 	if err != nil {
 		return nil, err
@@ -52,7 +65,7 @@ func (c Client) CreateRule(actionCode string, rule Rule) (*Rule, error) {
 	return &createdRule, nil
 }
 
-func (c Client) GetRule(actionCode string, ruleId string) (*Rule, error) {
+func (c Client) GetRule(actionCode string, ruleId string) (*RuleResponse, error) {
 	request, err := http.NewRequest("GET", fmt.Sprintf("%s/action-configurations/%s/rules/%s", c.Host, actionCode, ruleId), nil)
 	if err != nil {
 		return nil, err
@@ -63,7 +76,7 @@ func (c Client) GetRule(actionCode string, ruleId string) (*Rule, error) {
 		return nil, err
 	}
 
-	var rule Rule
+	var rule RuleResponse
 	err = json.Unmarshal(body, &rule)
 	if err != nil {
 		return nil, err
@@ -72,7 +85,7 @@ func (c Client) GetRule(actionCode string, ruleId string) (*Rule, error) {
 	return &rule, nil
 }
 
-func (c Client) UpdateRule(actionCode string, ruleId string, rule Rule) (*Rule, error) {
+func (c Client) UpdateRule(actionCode string, ruleId string, rule Rule) (*RuleResponse, error) {
 	updateBody, err := json.Marshal(rule)
 	if err != nil {
 		return nil, err
@@ -90,7 +103,7 @@ func (c Client) UpdateRule(actionCode string, ruleId string, rule Rule) (*Rule, 
 		return nil, err
 	}
 
-	var updatedRule Rule
+	var updatedRule RuleResponse
 	err = json.Unmarshal(body, &updatedRule)
 	if err != nil {
 		return nil, err
