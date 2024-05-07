@@ -14,7 +14,6 @@ go get github.com/authsignal/authsignal-management-go
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/authsignal/authsignal-management-go"
@@ -26,11 +25,12 @@ const authsignalURI = "https://api.authsignal.com/v1/management"
 const authsignalTenantId = "aaaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 
 func main() {
+	actionCode := "helloworld"
 	var actionConfiguration authsignal.ActionConfiguration
-	actionConfiguration.ActionCode = "helloworld"
+	actionConfiguration.ActionCode = authsignal.SetValue(actionCode)
 
 	var client authsignal.Client = authsignal.NewClient(authsignalURI, authsignalTenantId, authsignalSecret)
-	var actionConfigurationResponse, err = client.GetActionConfiguration(actionConfiguration.ActionCode)
+	var actionConfigurationResponse, err = client.GetActionConfiguration(actionCode)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -43,6 +43,9 @@ func main() {
 ## Available methods
 
 ```
+SetValue()
+SetNull()
+
 getActionConfigurationHttp()
 createActionConfigurationHttp()
 updateActionConfigurationHttp()
