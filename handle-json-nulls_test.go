@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestOne(t *testing.T) {
+func TestActionConfigurationJsonMarshal1(t *testing.T) {
 	actionConfiguration := ActionConfiguration{
-		ActionCode:              SetValue("hello world"),
+		ActionCode:              SetValue("hello-world"),
 		DefaultUserActionResult: SetValue("ALLOW"),
 	}
 
@@ -16,16 +16,16 @@ func TestOne(t *testing.T) {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"defaultUserActionResult\":\"ALLOW\",\"actionCode\":\"hello world\"}"
+	expectedJson := "{\"defaultUserActionResult\":\"ALLOW\",\"actionCode\":\"hello-world\"}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
 	}
 }
 
-func TestTwo(t *testing.T) {
+func TestActionConfigurationJsonMarshal2(t *testing.T) {
 	actionConfiguration := ActionConfiguration{
-		ActionCode:              SetValue("hello world"),
+		ActionCode:              SetValue("hello-world"),
 		DefaultUserActionResult: SetNull("ALLOW"),
 	}
 
@@ -34,16 +34,16 @@ func TestTwo(t *testing.T) {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"defaultUserActionResult\":null,\"actionCode\":\"hello world\"}"
+	expectedJson := "{\"defaultUserActionResult\":null,\"actionCode\":\"hello-world\"}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
 	}
 }
 
-func TestThree(t *testing.T) {
+func TestActionConfigurationJsonMarshal3(t *testing.T) {
 	actionConfiguration := ActionConfiguration{
-		ActionCode: SetValue("hello world"),
+		ActionCode: SetValue("hello-world"),
 	}
 
 	jsonBody, err := json.Marshal(actionConfiguration)
@@ -51,14 +51,14 @@ func TestThree(t *testing.T) {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"actionCode\":\"hello world\"}"
+	expectedJson := "{\"actionCode\":\"hello-world\"}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
 	}
 }
 
-func TestFour(t *testing.T) {
+func TestRuleJsonMarshal1(t *testing.T) {
 	rule := Rule{
 		Name:                SetValue("helloworld"),
 		Priority:            SetValue(int64(29)),
@@ -78,7 +78,7 @@ func TestFour(t *testing.T) {
 	}
 }
 
-func TestFive(t *testing.T) {
+func TestRuleJsonMarshal2(t *testing.T) {
 	var conditions Condition
 	err := json.Unmarshal([]byte("{\"hello\":\"world\"}"), &conditions)
 
@@ -106,7 +106,7 @@ func TestFive(t *testing.T) {
 	}
 }
 
-func TestSix(t *testing.T) {
+func TestRuleJsonMarshal3(t *testing.T) {
 	var conditions Condition
 	err := json.Unmarshal([]byte("{\"hello\":\"world\"}"), &conditions)
 
