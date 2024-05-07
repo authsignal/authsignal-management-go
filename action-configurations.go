@@ -8,13 +8,18 @@ import (
 )
 
 type ActionConfiguration struct {
+	DefaultUserActionResult NullableJsonInput[string] `json:"defaultUserActionResult,omitempty"`
+	ActionCode              NullableJsonInput[string] `json:"actionCode,omitempty"`
+}
+
+type ActionConfigurationResponse struct {
 	LastActionCreatedAt     string `json:"lastActionCreatedAt"`
 	DefaultUserActionResult string `json:"defaultUserActionResult"`
 	TenantId                string `json:"tenantId"`
 	ActionCode              string `json:"actionCode"`
 }
 
-func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfiguration, error) {
+func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, error) {
 	createBody, err := json.Marshal(actionConfiguration)
 	if err != nil {
 		return nil, err
@@ -32,7 +37,7 @@ func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguratio
 		return nil, err
 	}
 
-	var createdActionConfiguration ActionConfiguration
+	var createdActionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &createdActionConfiguration)
 	if err != nil {
 		return nil, err
@@ -41,7 +46,7 @@ func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguratio
 	return &createdActionConfiguration, nil
 }
 
-func (c Client) GetActionConfiguration(actionCode string) (*ActionConfiguration, error) {
+func (c Client) GetActionConfiguration(actionCode string) (*ActionConfigurationResponse, error) {
 	request, err := http.NewRequest("GET", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), nil)
 	if err != nil {
 		return nil, err
@@ -52,7 +57,7 @@ func (c Client) GetActionConfiguration(actionCode string) (*ActionConfiguration,
 		return nil, err
 	}
 
-	var actionConfiguration ActionConfiguration
+	var actionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &actionConfiguration)
 	if err != nil {
 		return nil, err
@@ -61,7 +66,7 @@ func (c Client) GetActionConfiguration(actionCode string) (*ActionConfiguration,
 	return &actionConfiguration, nil
 }
 
-func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration ActionConfiguration) (*ActionConfiguration, error) {
+func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, error) {
 	updateBody, err := json.Marshal(actionConfiguration)
 	if err != nil {
 		return nil, err
@@ -79,7 +84,7 @@ func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration
 		return nil, err
 	}
 
-	var updatedActionConfiguration ActionConfiguration
+	var updatedActionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &updatedActionConfiguration)
 	if err != nil {
 		return nil, err
