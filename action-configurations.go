@@ -7,16 +7,21 @@ import (
 	"net/http"
 )
 
+type MessagingTemplates interface {
+}
+
 type ActionConfiguration struct {
-	DefaultUserActionResult NullableJsonInput[string] `json:"defaultUserActionResult,omitempty"`
-	ActionCode              NullableJsonInput[string] `json:"actionCode,omitempty"`
+	DefaultUserActionResult NullableJsonInput[string]             `json:"defaultUserActionResult,omitempty"`
+	ActionCode              NullableJsonInput[string]             `json:"actionCode,omitempty"`
+	MessagingTemplates      NullableJsonInput[MessagingTemplates] `json:"messagingTemplates,omitempty"`
 }
 
 type ActionConfigurationResponse struct {
-	LastActionCreatedAt     string `json:"lastActionCreatedAt"`
-	DefaultUserActionResult string `json:"defaultUserActionResult"`
-	TenantId                string `json:"tenantId"`
-	ActionCode              string `json:"actionCode"`
+	LastActionCreatedAt     string             `json:"lastActionCreatedAt"`
+	DefaultUserActionResult string             `json:"defaultUserActionResult"`
+	TenantId                string             `json:"tenantId"`
+	ActionCode              string             `json:"actionCode"`
+	MessagingTemplates      MessagingTemplates `json:"messagingTemplates"`
 }
 
 func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, error) {
