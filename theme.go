@@ -173,49 +173,49 @@ type ThemeResponse struct {
 	Name           string                 `json:"name"`
 }
 
-func (c Client) GetTheme() (*ThemeResponse, error) {
+func (c Client) GetTheme() (*ThemeResponse, int, error) {
 	request, err := http.NewRequest("GET", fmt.Sprintf("%s/theme", c.Host), nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var theme ThemeResponse
 	err = json.Unmarshal(body, &theme)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &theme, nil
+	return &theme, statusCode, nil
 }
 
-func (c Client) UpdateTheme(theme Theme) (*ThemeResponse, error) {
+func (c Client) UpdateTheme(theme Theme) (*ThemeResponse, int, error) {
 	updateBody, err := json.MarshalIndent(theme, "", "\t")
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/theme", c.Host), bytes.NewReader(updateBody))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request.Header.Set("Content-Type", "application/json")
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var updatedTheme ThemeResponse
 	err = json.Unmarshal(body, &updatedTheme)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &updatedTheme, nil
+	return &updatedTheme, statusCode, nil
 }

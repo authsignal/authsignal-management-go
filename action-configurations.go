@@ -30,97 +30,97 @@ type ActionConfigurationResponse struct {
 	DefaultVerificationMethod         string             `json:"defaultVerificationMethod"`
 }
 
-func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, error) {
+func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, int, error) {
 	createBody, err := json.Marshal(actionConfiguration)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request, err := http.NewRequest("POST", fmt.Sprintf("%s/action-configurations", c.Host), bytes.NewReader(createBody))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request.Header.Set("Content-Type", "application/json")
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var createdActionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &createdActionConfiguration)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &createdActionConfiguration, nil
+	return &createdActionConfiguration, statusCode, nil
 }
 
-func (c Client) GetActionConfiguration(actionCode string) (*ActionConfigurationResponse, error) {
+func (c Client) GetActionConfiguration(actionCode string) (*ActionConfigurationResponse, int, error) {
 	request, err := http.NewRequest("GET", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var actionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &actionConfiguration)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &actionConfiguration, nil
+	return &actionConfiguration, statusCode, nil
 }
 
-func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, error) {
+func (c Client) UpdateActionConfiguration(actionCode string, actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, int, error) {
 	updateBody, err := json.Marshal(actionConfiguration)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), bytes.NewReader(updateBody))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	request.Header.Set("Content-Type", "application/json")
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var updatedActionConfiguration ActionConfigurationResponse
 	err = json.Unmarshal(body, &updatedActionConfiguration)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &updatedActionConfiguration, nil
+	return &updatedActionConfiguration, statusCode, nil
 }
 
-func (c Client) DeleteActionConfiguration(actionCode string) (*HttpStatusResponse, error) {
+func (c Client) DeleteActionConfiguration(actionCode string) (*HttpStatusResponse, int, error) {
 	request, err := http.NewRequest("DELETE", fmt.Sprintf("%s/action-configurations/%s", c.Host, actionCode), nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	body, err := c.makeRequest(request, c.ApiSecret)
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	var httpStatusResponse HttpStatusResponse
 
 	err = json.Unmarshal(body, &httpStatusResponse)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
-	return &httpStatusResponse, nil
+	return &httpStatusResponse, statusCode, nil
 }
