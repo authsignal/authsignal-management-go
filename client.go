@@ -47,7 +47,7 @@ func (c Client) makeRequest(request *http.Request, apiSecret string) ([]byte, in
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, 0, err
+		return nil, response.StatusCode, err
 	}
 
 	if response.StatusCode > 299 {
