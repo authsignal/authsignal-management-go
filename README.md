@@ -5,7 +5,7 @@ This Go SDK is a wrapper for Authsignal's Management API and is used by Authsign
 ## Installation
 
 ```
-go get github.com/authsignal/authsignal-management-go/v3
+go get github.com/authsignal/authsignal-management-go/v4
 ```
 
 ## Example Usage
@@ -16,7 +16,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/authsignal/authsignal-management-go/v3"
+	"github.com/authsignal/authsignal-management-go/v4"
 )
 
 const authsignalSecret = "<management api secret retrieved from the admin portal>"
