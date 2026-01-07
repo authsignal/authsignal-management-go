@@ -44,7 +44,6 @@ type Colors struct {
 
 type Container struct {
 	ContentAlignment NullableJsonInput[string] `json:"contentAlignment,omitempty"`
-	Position         NullableJsonInput[string] `json:"position,omitempty"`
 	Padding          NullableJsonInput[int64]  `json:"padding,omitempty"`
 	LogoAlignment    NullableJsonInput[string] `json:"logoAlignment,omitempty"`
 	LogoPosition     NullableJsonInput[string] `json:"logoPosition,omitempty"`
@@ -127,7 +126,6 @@ type ColorsResponse struct {
 
 type ContainerResponse struct {
 	ContentAlignment string `json:"contentAlignment"`
-	Position         string `json:"position"`
 	Padding          int64  `json:"padding"`
 	LogoAlignment    string `json:"logoAlignment"`
 	LogoPosition     string `json:"logoPosition"`

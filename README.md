@@ -46,15 +46,27 @@ func main() {
 SetValue()
 SetNull()
 
-GetActionConfigurationHttp()
-CreateActionConfigurationHttp()
-UpdateActionConfigurationHttp()
-DeleteActionConfigurationHttp()
+GetActionConfiguration()
+CreateActionConfiguration()
+UpdateActionConfiguration()
+DeleteActionConfiguration()
 
-GetRuleHttp()
-CreateRuleHttp()
-UpdateRuleHttp()
-DeleteRuleHttp()
+GetRule()
+CreateRule()
+UpdateRule()
+DeleteRule()
+
+GetValueList()
+CreateValueList()
+UpdateValueList()
+DeleteValueList()
+
+GetTheme()
+UpdateTheme()
+
+GetCustomDataPoint()
+CreateCustomDataPoint()
+DeleteCustomDataPoint()
 ```
 
 ## Documentation
