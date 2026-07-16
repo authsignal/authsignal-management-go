@@ -13,6 +13,7 @@ type CustomDataPoint struct {
 	DataType    NullableJsonInput[string] `json:"dataType,omitempty"`
 	ModelType   NullableJsonInput[string] `json:"modelType,omitempty"`
 	Description NullableJsonInput[string] `json:"description,omitempty"`
+	IsPublic    NullableJsonInput[bool]   `json:"isPublic,omitempty"`
 }
 
 type CustomDataPointResponse struct {
@@ -21,6 +22,7 @@ type CustomDataPointResponse struct {
 	DataType    string `json:"dataType"`
 	ModelType   string `json:"modelType"`
 	Description string `json:"description"`
+	IsPublic    bool   `json:"isPublic"`
 }
 
 func (c Client) CreateCustomDataPoint(customDataPoint CustomDataPoint) (*CustomDataPointResponse, int, error) {
@@ -69,6 +71,33 @@ func (c Client) GetCustomDataPoint(id string) (*CustomDataPointResponse, int, er
 	}
 
 	return &customDataPoint, statusCode, nil
+}
+
+func (c Client) UpdateCustomDataPoint(id string, customDataPoint CustomDataPoint) (*CustomDataPointResponse, int, error) {
+	updateBody, err := json.Marshal(customDataPoint)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	request, err := http.NewRequest("PATCH", fmt.Sprintf("%s/custom-data-points/%s", c.Host, id), bytes.NewReader(updateBody))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
+	if err != nil {
+		return nil, statusCode, err
+	}
+
+	var updatedCustomDataPoint CustomDataPointResponse
+	err = json.Unmarshal(body, &updatedCustomDataPoint)
+	if err != nil {
+		return nil, statusCode, err
+	}
+
+	return &updatedCustomDataPoint, statusCode, nil
 }
 
 func (c Client) DeleteCustomDataPoint(id string) (*HttpStatusResponse, int, error) {

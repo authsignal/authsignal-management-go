@@ -66,6 +66,7 @@ UpdateTheme()
 
 GetCustomDataPoint()
 CreateCustomDataPoint()
+UpdateCustomDataPoint()
 DeleteCustomDataPoint()
 ```
 
