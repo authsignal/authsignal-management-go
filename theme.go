@@ -55,12 +55,49 @@ type PageBackground struct {
 	BackgroundImageUrl NullableJsonInput[string] `json:"backgroundImageUrl,omitempty"`
 }
 
-type Display struct {
+// MaxFontFacesPerTypeface mirrors the cap the Management API enforces on each typeface's face list.
+const MaxFontFacesPerTypeface = 6
+
+// FontWeight is a single weight ("400") or an ascending range ("100 900"). The API stores a single
+// weight as a number and a range as a string, so it can come back as either JSON type.
+type FontWeight string
+
+func (w FontWeight) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(w))
+}
+
+func (w *FontWeight) UnmarshalJSON(data []byte) error {
+	var asString string
+	if err := json.Unmarshal(data, &asString); err == nil {
+		*w = FontWeight(asString)
+		return nil
+	}
+
+	var asNumber json.Number
+	if err := json.Unmarshal(data, &asNumber); err != nil {
+		return fmt.Errorf("font weight must be a string or a number, got %s", data)
+	}
+
+	*w = FontWeight(asNumber.String())
+
+	return nil
+}
+
+type FontFace struct {
+	Url    string     `json:"url"`
+	Weight FontWeight `json:"weight,omitempty"`
+}
+
+type Typeface struct {
+	Faces NullableJsonInput[[]FontFace] `json:"faces,omitempty"`
+	// Deprecated: the single-url shape. Prefer Faces, which carries a weight per file.
 	FontUrl NullableJsonInput[string] `json:"fontUrl,omitempty"`
 }
 
+// Typography sits on Theme only. A typeface is shared by both colour modes, so DarkMode has none.
 type Typography struct {
-	Display NullableJsonInput[Display] `json:"display,omitempty"`
+	Text    NullableJsonInput[Typeface] `json:"text,omitempty"`
+	Display NullableJsonInput[Typeface] `json:"display,omitempty"`
 }
 
 type DarkMode struct {
@@ -68,7 +105,6 @@ type DarkMode struct {
 	Colors         NullableJsonInput[Colors]         `json:"colors,omitempty"`
 	Container      NullableJsonInput[Container]      `json:"container,omitempty"`
 	PageBackground NullableJsonInput[PageBackground] `json:"pageBackground,omitempty"`
-	Typography     NullableJsonInput[Typography]     `json:"typography,omitempty"`
 	LogoUrl        NullableJsonInput[string]         `json:"logoUrl,omitempty"`
 	WatermarkUrl   NullableJsonInput[string]         `json:"watermarkUrl,omitempty"`
 	FaviconUrl     NullableJsonInput[string]         `json:"faviconUrl,omitempty"`
@@ -137,12 +173,19 @@ type PageBackgroundResponse struct {
 	BackgroundImageUrl string `json:"backgroundImageUrl"`
 }
 
-type DisplayResponse struct {
-	FontUrl string `json:"fontUrl"`
+type FontFaceResponse struct {
+	Url    string     `json:"url"`
+	Weight FontWeight `json:"weight"`
+}
+
+type TypefaceResponse struct {
+	Faces   []FontFaceResponse `json:"faces"`
+	FontUrl string             `json:"fontUrl"`
 }
 
 type TypographyResponse struct {
-	Display DisplayResponse `json:"display"`
+	Text    TypefaceResponse `json:"text"`
+	Display TypefaceResponse `json:"display"`
 }
 
 type DarkModeResponse struct {
@@ -150,7 +193,6 @@ type DarkModeResponse struct {
 	Colors         ColorsResponse         `json:"colors"`
 	Container      ContainerResponse      `json:"container"`
 	PageBackground PageBackgroundResponse `json:"pageBackground"`
-	Typography     TypographyResponse     `json:"typography"`
 	LogoUrl        string                 `json:"logoUrl"`
 	WatermarkUrl   string                 `json:"watermarkUrl"`
 	FaviconUrl     string                 `json:"faviconUrl"`
