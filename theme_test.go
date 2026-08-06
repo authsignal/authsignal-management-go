@@ -95,6 +95,92 @@ func TestThemeTypographyMarshalsBothRoles(t *testing.T) {
 	}
 }
 
+func TestSwitchesMarshalWhenSetToFalse(t *testing.T) {
+	theme := Theme{
+		Links:   SetValue(Links{Underline: SetValue(false)}),
+		Shadows: SetValue(Shadows{Enabled: SetValue(false)}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"links\":{\"underline\":false},\"shadows\":{\"enabled\":false}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestSwitchesCanBeClearedWithNull(t *testing.T) {
+	theme := Theme{
+		Links:   SetValue(Links{Underline: SetNull(false)}),
+		Shadows: SetValue(Shadows{Enabled: SetNull(false)}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"links\":{\"underline\":null},\"shadows\":{\"enabled\":null}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// The API omits a switch the tenant never set, which has to read back as unset rather than as off.
+func TestSwitchesReadAbsentApartFromFalse(t *testing.T) {
+	testCases := []struct {
+		name     string
+		body     string
+		expected *bool
+	}{
+		{name: "absent", body: "{}", expected: nil},
+		{name: "empty switch", body: "{\"links\":{},\"shadows\":{}}", expected: nil},
+		{name: "off", body: "{\"links\":{\"underline\":false},\"shadows\":{\"enabled\":false}}", expected: boolPointer(false)},
+		{name: "on", body: "{\"links\":{\"underline\":true},\"shadows\":{\"enabled\":true}}", expected: boolPointer(true)},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			var theme ThemeResponse
+
+			if err := json.Unmarshal([]byte(testCase.body), &theme); err != nil {
+				t.Fatalf("failed to unmarshal json: %v", err)
+			}
+
+			assertBoolPointer(t, "underline", theme.Links.Underline, testCase.expected)
+			assertBoolPointer(t, "shadows enabled", theme.Shadows.Enabled, testCase.expected)
+		})
+	}
+}
+
+func boolPointer(value bool) *bool {
+	return &value
+}
+
+func assertBoolPointer(t *testing.T, name string, actual *bool, expected *bool) {
+	t.Helper()
+
+	if expected == nil {
+		if actual != nil {
+			t.Fatalf("bad %v. expected: unset. got : %v", name, *actual)
+		}
+		return
+	}
+
+	if actual == nil {
+		t.Fatalf("bad %v. expected: %v. got : unset", name, *expected)
+	}
+
+	if *actual != *expected {
+		t.Fatalf("bad %v. expected: %v. got : %v", name, *expected, *actual)
+	}
+}
+
 func TestFacesCanBeClearedWithNull(t *testing.T) {
 	typeface := Typeface{Faces: SetNull([]FontFace{})}
 
