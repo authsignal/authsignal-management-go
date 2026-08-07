@@ -100,6 +100,15 @@ type Typography struct {
 	Display NullableJsonInput[Typeface] `json:"display,omitempty"`
 }
 
+// Links and Shadows sit on Theme only. Neither is a design token, so DarkMode has neither.
+type Links struct {
+	Underline NullableJsonInput[bool] `json:"underline,omitempty"`
+}
+
+type Shadows struct {
+	Enabled NullableJsonInput[bool] `json:"enabled,omitempty"`
+}
+
 type DarkMode struct {
 	Borders        NullableJsonInput[Borders]        `json:"borders,omitempty"`
 	Colors         NullableJsonInput[Colors]         `json:"colors,omitempty"`
@@ -117,6 +126,8 @@ type Theme struct {
 	Container      NullableJsonInput[Container]      `json:"container,omitempty"`
 	PageBackground NullableJsonInput[PageBackground] `json:"pageBackground,omitempty"`
 	Typography     NullableJsonInput[Typography]     `json:"typography,omitempty"`
+	Links          NullableJsonInput[Links]          `json:"links,omitempty"`
+	Shadows        NullableJsonInput[Shadows]        `json:"shadows,omitempty"`
 	LogoUrl        NullableJsonInput[string]         `json:"logoUrl,omitempty"`
 	WatermarkUrl   NullableJsonInput[string]         `json:"watermarkUrl,omitempty"`
 	FaviconUrl     NullableJsonInput[string]         `json:"faviconUrl,omitempty"`
@@ -188,6 +199,15 @@ type TypographyResponse struct {
 	Display TypefaceResponse `json:"display"`
 }
 
+// A pointer, because the API omits a switch the tenant never set and `false` is a value they set.
+type LinksResponse struct {
+	Underline *bool `json:"underline"`
+}
+
+type ShadowsResponse struct {
+	Enabled *bool `json:"enabled"`
+}
+
 type DarkModeResponse struct {
 	Borders        BordersResponse        `json:"borders"`
 	Colors         ColorsResponse         `json:"colors"`
@@ -205,6 +225,8 @@ type ThemeResponse struct {
 	Container      ContainerResponse      `json:"container"`
 	PageBackground PageBackgroundResponse `json:"pageBackground"`
 	Typography     TypographyResponse     `json:"typography"`
+	Links          LinksResponse          `json:"links"`
+	Shadows        ShadowsResponse        `json:"shadows"`
 	LogoUrl        string                 `json:"logoUrl"`
 	WatermarkUrl   string                 `json:"watermarkUrl"`
 	FaviconUrl     string                 `json:"faviconUrl"`
