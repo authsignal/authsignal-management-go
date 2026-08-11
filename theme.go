@@ -42,7 +42,18 @@ type Colors struct {
 	Focus                     NullableJsonInput[string] `json:"focus,omitempty"`
 }
 
+// ExitPosition sits on Container only. Where the exit control sits is theme-wide, so DarkMode takes
+// ModeContainer instead: the API rejects an exitPosition under darkMode.
 type Container struct {
+	ContentAlignment NullableJsonInput[string] `json:"contentAlignment,omitempty"`
+	Padding          NullableJsonInput[int64]  `json:"padding,omitempty"`
+	LogoAlignment    NullableJsonInput[string] `json:"logoAlignment,omitempty"`
+	LogoPosition     NullableJsonInput[string] `json:"logoPosition,omitempty"`
+	LogoHeight       NullableJsonInput[int64]  `json:"logoHeight,omitempty"`
+	ExitPosition     NullableJsonInput[string] `json:"exitPosition,omitempty"`
+}
+
+type ModeContainer struct {
 	ContentAlignment NullableJsonInput[string] `json:"contentAlignment,omitempty"`
 	Padding          NullableJsonInput[int64]  `json:"padding,omitempty"`
 	LogoAlignment    NullableJsonInput[string] `json:"logoAlignment,omitempty"`
@@ -112,7 +123,7 @@ type Shadows struct {
 type DarkMode struct {
 	Borders        NullableJsonInput[Borders]        `json:"borders,omitempty"`
 	Colors         NullableJsonInput[Colors]         `json:"colors,omitempty"`
-	Container      NullableJsonInput[Container]      `json:"container,omitempty"`
+	Container      NullableJsonInput[ModeContainer]  `json:"container,omitempty"`
 	PageBackground NullableJsonInput[PageBackground] `json:"pageBackground,omitempty"`
 	LogoUrl        NullableJsonInput[string]         `json:"logoUrl,omitempty"`
 	WatermarkUrl   NullableJsonInput[string]         `json:"watermarkUrl,omitempty"`
@@ -177,6 +188,15 @@ type ContainerResponse struct {
 	LogoAlignment    string `json:"logoAlignment"`
 	LogoPosition     string `json:"logoPosition"`
 	LogoHeight       int64  `json:"logoHeight"`
+	ExitPosition     string `json:"exitPosition"`
+}
+
+type ModeContainerResponse struct {
+	ContentAlignment string `json:"contentAlignment"`
+	Padding          int64  `json:"padding"`
+	LogoAlignment    string `json:"logoAlignment"`
+	LogoPosition     string `json:"logoPosition"`
+	LogoHeight       int64  `json:"logoHeight"`
 }
 
 type PageBackgroundResponse struct {
@@ -211,7 +231,7 @@ type ShadowsResponse struct {
 type DarkModeResponse struct {
 	Borders        BordersResponse        `json:"borders"`
 	Colors         ColorsResponse         `json:"colors"`
-	Container      ContainerResponse      `json:"container"`
+	Container      ModeContainerResponse  `json:"container"`
 	PageBackground PageBackgroundResponse `json:"pageBackground"`
 	LogoUrl        string                 `json:"logoUrl"`
 	WatermarkUrl   string                 `json:"watermarkUrl"`

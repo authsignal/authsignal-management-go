@@ -181,6 +181,53 @@ func assertBoolPointer(t *testing.T, name string, actual *bool, expected *bool) 
 	}
 }
 
+// The API rejects an exitPosition under darkMode, so only the theme container can carry one.
+func TestExitPositionMarshalsOnTheThemeContainerOnly(t *testing.T) {
+	theme := Theme{
+		Container: SetValue(Container{Padding: SetValue(int64(8)), ExitPosition: SetValue("bottom")}),
+		DarkMode:  SetValue(DarkMode{Container: SetValue(ModeContainer{Padding: SetValue(int64(8))})}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"padding\":8,\"exitPosition\":\"bottom\"},\"darkMode\":{\"container\":{\"padding\":8}}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// A null clears the stored value, so an unset exit position has to be absent rather than null.
+func TestExitPositionIsOmittedWhenUnset(t *testing.T) {
+	theme := Theme{Container: SetValue(Container{Padding: SetValue(int64(8))})}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"padding\":8}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestExitPositionReadsFromTheThemeContainer(t *testing.T) {
+	var theme ThemeResponse
+
+	if err := json.Unmarshal([]byte("{\"container\":{\"exitPosition\":\"bottom\"}}"), &theme); err != nil {
+		t.Fatalf("failed to unmarshal json: %v", err)
+	}
+
+	if theme.Container.ExitPosition != "bottom" {
+		t.Fatalf("bad exit position. expected: bottom. got : %v", theme.Container.ExitPosition)
+	}
+}
+
 func TestFacesCanBeClearedWithNull(t *testing.T) {
 	typeface := Typeface{Faces: SetNull([]FontFace{})}
 
