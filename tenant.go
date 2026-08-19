@@ -7,17 +7,16 @@ import (
 	"net/http"
 )
 
-// TenantSettings is the request shape for updating a tenant's settings. It covers the settings the
-// SDK manages rather than every setting the endpoint accepts, so more are added here as they are
-// needed. A tenant always exists, so this is a partial update: fields left unset are omitted from
-// the request and keep their current value. Use SetValue to send a setting, including a false one.
+// TenantSettings is the request shape for updating a tenant's settings. It covers the settings this
+// client can write, not every field the endpoint accepts. A tenant always exists, so an update is
+// partial: a setting left unset keeps its current value. Use SetValue to send one, including false.
 type TenantSettings struct {
 	HideSuccessScreenOnEnrollment NullableJsonInput[bool] `json:"hideSuccessScreenOnEnrollment,omitempty"`
 }
 
-// TenantResponse is the response shape for a tenant, narrowed to the settings TenantSettings can
-// write. Fields are pointers because the API omits a setting the tenant has never had set, which is
-// not the same as one set to false.
+// TenantResponse is the response shape for a tenant, covering the same settings TenantSettings can
+// write. A nil field means the setting has never been set on the tenant, which is not the same as
+// it being set to false.
 type TenantResponse struct {
 	HideSuccessScreenOnEnrollment *bool `json:"hideSuccessScreenOnEnrollment,omitempty"`
 }
