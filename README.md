@@ -68,6 +68,13 @@ GetCustomDataPoint()
 CreateCustomDataPoint()
 UpdateCustomDataPoint()
 DeleteCustomDataPoint()
+
+GetMessageOverrides()
+UpdateMessageOverrides()
+GetMessageOverridesCatalog()
+
+GetTenant()
+UpdateTenant()
 ```
 
 ## Documentation
