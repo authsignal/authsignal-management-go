@@ -7,31 +7,19 @@ import (
 	"net/http"
 )
 
-// TenantSettings is the request shape for updating a tenant's settings. A tenant always exists, so
-// this is a partial update: fields left unset are omitted from the request and keep their current
-// value. Use SetValue to send a setting, including a false or zero one.
+// TenantSettings is the request shape for updating a tenant's settings. It covers the settings the
+// SDK manages rather than every setting the endpoint accepts, so more are added here as they are
+// needed. A tenant always exists, so this is a partial update: fields left unset are omitted from
+// the request and keep their current value. Use SetValue to send a setting, including a false one.
 type TenantSettings struct {
-	Name                          NullableJsonInput[string] `json:"name,omitempty"`
-	TokenDurationInMinutes        NullableJsonInput[int64]  `json:"tokenDurationInMinutes,omitempty"`
-	DisableRecoveryCodes          NullableJsonInput[bool]   `json:"disableRecoveryCodes,omitempty"`
-	HideSuccessScreenOnEnrollment NullableJsonInput[bool]   `json:"hideSuccessScreenOnEnrollment,omitempty"`
+	HideSuccessScreenOnEnrollment NullableJsonInput[bool] `json:"hideSuccessScreenOnEnrollment,omitempty"`
 }
 
-// TenantResponse is the response shape for a tenant. It carries settings that are readable but not
-// writable through this API, so it is wider than TenantSettings. Fields are pointers because the
-// API omits a setting the tenant has never had set, which is not the same as one set to false.
+// TenantResponse is the response shape for a tenant, narrowed to the settings TenantSettings can
+// write. Fields are pointers because the API omits a setting the tenant has never had set, which is
+// not the same as one set to false.
 type TenantResponse struct {
-	TenantId                                  string  `json:"tenantId"`
-	Name                                      *string `json:"name,omitempty"`
-	CustomDomain                              *string `json:"customDomain,omitempty"`
-	TokenDurationInMinutes                    *int64  `json:"tokenDurationInMinutes,omitempty"`
-	AllowDisablingMfa                         *bool   `json:"allowDisablingMfa,omitempty"`
-	HideAuthsignalLogo                        *bool   `json:"hideAuthsignalLogo,omitempty"`
-	RedirectOnSessionExpiry                   *bool   `json:"redirectOnSessionExpiry,omitempty"`
-	DisableRecoveryCodes                      *bool   `json:"disableRecoveryCodes,omitempty"`
-	SkipRecoveryCodesOnProgrammaticEnrollment *bool   `json:"skipRecoveryCodesOnProgrammaticEnrollment,omitempty"`
-	HideRecoveryCodesOnEnrollment             *bool   `json:"hideRecoveryCodesOnEnrollment,omitempty"`
-	HideSuccessScreenOnEnrollment             *bool   `json:"hideSuccessScreenOnEnrollment,omitempty"`
+	HideSuccessScreenOnEnrollment *bool `json:"hideSuccessScreenOnEnrollment,omitempty"`
 }
 
 func (c Client) GetTenant() (*TenantResponse, int, error) {

@@ -6,27 +6,24 @@ import (
 )
 
 func TestTenantSettingsOmitsUnsetFields(t *testing.T) {
-	tenantSettings := TenantSettings{
-		Name: SetValue("hello-world"),
-	}
+	tenantSettings := TenantSettings{}
 
 	jsonBody, err := json.Marshal(tenantSettings)
 	if err != nil {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"name\":\"hello-world\"}"
+	expectedJson := "{}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
 	}
 }
 
-// A false setting has to reach the API. Plain bool fields with omitempty would drop it, leaving the
+// A false setting has to reach the API. A plain bool field with omitempty would drop it, leaving the
 // setting on whatever it already was.
 func TestTenantSettingsSendsFalseSettings(t *testing.T) {
 	tenantSettings := TenantSettings{
-		DisableRecoveryCodes:          SetValue(false),
 		HideSuccessScreenOnEnrollment: SetValue(false),
 	}
 
@@ -35,7 +32,7 @@ func TestTenantSettingsSendsFalseSettings(t *testing.T) {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"disableRecoveryCodes\":false,\"hideSuccessScreenOnEnrollment\":false}"
+	expectedJson := "{\"hideSuccessScreenOnEnrollment\":false}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
@@ -43,18 +40,25 @@ func TestTenantSettingsSendsFalseSettings(t *testing.T) {
 }
 
 func TestTenantResponseDistinguishesUnsetFromFalse(t *testing.T) {
-	var tenant TenantResponse
+	var setToFalse TenantResponse
 
-	err := json.Unmarshal([]byte("{\"tenantId\":\"abc\",\"disableRecoveryCodes\":false}"), &tenant)
+	err := json.Unmarshal([]byte("{\"hideSuccessScreenOnEnrollment\":false}"), &setToFalse)
 	if err != nil {
 		t.Fatalf("failed to unmarshal json")
 	}
 
-	if tenant.DisableRecoveryCodes == nil || *tenant.DisableRecoveryCodes {
-		t.Fatalf("expected disableRecoveryCodes to be set to false")
+	if setToFalse.HideSuccessScreenOnEnrollment == nil || *setToFalse.HideSuccessScreenOnEnrollment {
+		t.Fatalf("expected hideSuccessScreenOnEnrollment to be set to false")
 	}
 
-	if tenant.HideSuccessScreenOnEnrollment != nil {
+	var unset TenantResponse
+
+	err = json.Unmarshal([]byte("{\"tenantId\":\"abc\"}"), &unset)
+	if err != nil {
+		t.Fatalf("failed to unmarshal json")
+	}
+
+	if unset.HideSuccessScreenOnEnrollment != nil {
 		t.Fatalf("expected an absent hideSuccessScreenOnEnrollment to stay nil")
 	}
 }
