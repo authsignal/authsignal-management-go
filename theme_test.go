@@ -70,7 +70,7 @@ func TestFontWeightRejectsAValueThatIsNeitherStringNorNumber(t *testing.T) {
 	}
 }
 
-func TestThemeTypographyMarshalsBothRoles(t *testing.T) {
+func TestThemeTypographyMarshalsEveryRole(t *testing.T) {
 	theme := Theme{
 		Typography: SetValue(Typography{
 			Text: SetValue(Typeface{
@@ -80,6 +80,7 @@ func TestThemeTypographyMarshalsBothRoles(t *testing.T) {
 				}),
 			}),
 			Display: SetValue(Typeface{FontUrl: SetValue("https://cdn.example.com/display.woff2")}),
+			Button:  SetValue(Typeface{Faces: SetValue([]FontFace{{Url: "https://cdn.example.com/button.woff2", Weight: "500"}})}),
 		}),
 	}
 
@@ -88,7 +89,7 @@ func TestThemeTypographyMarshalsBothRoles(t *testing.T) {
 		t.Fatalf("failed to marshal json")
 	}
 
-	expectedJson := "{\"typography\":{\"text\":{\"faces\":[{\"url\":\"https://cdn.example.com/regular.woff2\",\"weight\":\"400\"},{\"url\":\"https://cdn.example.com/variable.woff2\",\"weight\":\"100 900\"}]},\"display\":{\"fontUrl\":\"https://cdn.example.com/display.woff2\"}}}"
+	expectedJson := "{\"typography\":{\"text\":{\"faces\":[{\"url\":\"https://cdn.example.com/regular.woff2\",\"weight\":\"400\"},{\"url\":\"https://cdn.example.com/variable.woff2\",\"weight\":\"100 900\"}]},\"display\":{\"fontUrl\":\"https://cdn.example.com/display.woff2\"},\"button\":{\"faces\":[{\"url\":\"https://cdn.example.com/button.woff2\",\"weight\":\"500\"}]}}}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
