@@ -109,6 +109,7 @@ type Typeface struct {
 type Typography struct {
 	Text    NullableJsonInput[Typeface] `json:"text,omitempty"`
 	Display NullableJsonInput[Typeface] `json:"display,omitempty"`
+	Button  NullableJsonInput[Typeface] `json:"button,omitempty"`
 }
 
 // Links and Shadows sit on Theme only. Neither is a design token, so DarkMode has neither.
@@ -217,6 +218,7 @@ type TypefaceResponse struct {
 type TypographyResponse struct {
 	Text    TypefaceResponse `json:"text"`
 	Display TypefaceResponse `json:"display"`
+	Button  TypefaceResponse `json:"button"`
 }
 
 // A pointer, because the API omits a switch the tenant never set and `false` is a value they set.
