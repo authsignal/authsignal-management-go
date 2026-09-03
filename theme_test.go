@@ -182,6 +182,66 @@ func assertBoolPointer(t *testing.T, name string, actual *bool, expected *bool) 
 	}
 }
 
+func TestShadowsMarshalOnBothColourModes(t *testing.T) {
+	theme := Theme{
+		Shadows:  SetValue(Shadows{Enabled: SetValue(true)}),
+		DarkMode: SetValue(DarkMode{Shadows: SetValue(Shadows{Enabled: SetValue(false)})}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"shadows\":{\"enabled\":true},\"darkMode\":{\"shadows\":{\"enabled\":false}}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// A null clears the stored value, so an unset dark mode switch has to be absent rather than null.
+func TestDarkModeShadowsAreOmittedWhenUnset(t *testing.T) {
+	theme := Theme{DarkMode: SetValue(DarkMode{PrimaryColor: SetValue("#111111")})}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"darkMode\":{\"primaryColor\":\"#111111\"}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// The dark mode switch reads back like the theme one: absent stays unset, false reads as off.
+func TestDarkModeShadowsReadAbsentApartFromFalse(t *testing.T) {
+	testCases := []struct {
+		name     string
+		body     string
+		expected *bool
+	}{
+		{name: "absent", body: "{\"darkMode\":{}}", expected: nil},
+		{name: "empty switch", body: "{\"darkMode\":{\"shadows\":{}}}", expected: nil},
+		{name: "off", body: "{\"darkMode\":{\"shadows\":{\"enabled\":false}}}", expected: boolPointer(false)},
+		{name: "on", body: "{\"darkMode\":{\"shadows\":{\"enabled\":true}}}", expected: boolPointer(true)},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			var theme ThemeResponse
+
+			if err := json.Unmarshal([]byte(testCase.body), &theme); err != nil {
+				t.Fatalf("failed to unmarshal json: %v", err)
+			}
+
+			assertBoolPointer(t, "dark mode shadows enabled", theme.DarkMode.Shadows.Enabled, testCase.expected)
+		})
+	}
+}
+
 // The API rejects an exitPosition under darkMode, so only the theme container can carry one.
 func TestExitPositionMarshalsOnTheThemeContainerOnly(t *testing.T) {
 	theme := Theme{
