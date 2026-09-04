@@ -112,11 +112,13 @@ type Typography struct {
 	Button  NullableJsonInput[Typeface] `json:"button,omitempty"`
 }
 
-// Links and Shadows sit on Theme only. Neither is a design token, so DarkMode has neither.
+// Links sits on Theme only. Whether a link carries an underline is theme-wide, so DarkMode has none.
 type Links struct {
 	Underline NullableJsonInput[bool] `json:"underline,omitempty"`
 }
 
+// Shadows sits on Theme and on DarkMode: a brand lifts a card with a shadow on a light page and with
+// a border on a dark one.
 type Shadows struct {
 	Enabled NullableJsonInput[bool] `json:"enabled,omitempty"`
 }
@@ -126,6 +128,7 @@ type DarkMode struct {
 	Colors         NullableJsonInput[Colors]         `json:"colors,omitempty"`
 	Container      NullableJsonInput[ModeContainer]  `json:"container,omitempty"`
 	PageBackground NullableJsonInput[PageBackground] `json:"pageBackground,omitempty"`
+	Shadows        NullableJsonInput[Shadows]        `json:"shadows,omitempty"`
 	LogoUrl        NullableJsonInput[string]         `json:"logoUrl,omitempty"`
 	WatermarkUrl   NullableJsonInput[string]         `json:"watermarkUrl,omitempty"`
 	FaviconUrl     NullableJsonInput[string]         `json:"faviconUrl,omitempty"`
@@ -235,6 +238,7 @@ type DarkModeResponse struct {
 	Colors         ColorsResponse         `json:"colors"`
 	Container      ModeContainerResponse  `json:"container"`
 	PageBackground PageBackgroundResponse `json:"pageBackground"`
+	Shadows        ShadowsResponse        `json:"shadows"`
 	LogoUrl        string                 `json:"logoUrl"`
 	WatermarkUrl   string                 `json:"watermarkUrl"`
 	FaviconUrl     string                 `json:"faviconUrl"`
