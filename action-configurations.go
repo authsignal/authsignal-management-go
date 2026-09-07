@@ -10,6 +10,9 @@ import (
 type MessagingTemplates interface {
 }
 
+// A node is passed through verbatim, so it is held as raw bytes rather than decoded into a Go value.
+type ActionNode = json.RawMessage
+
 type ActionConfiguration struct {
 	DefaultUserActionResult           NullableJsonInput[string]             `json:"defaultUserActionResult,omitempty"`
 	ActionCode                        NullableJsonInput[string]             `json:"actionCode,omitempty"`
@@ -17,6 +20,8 @@ type ActionConfiguration struct {
 	VerificationMethods               NullableJsonInput[[]string]           `json:"verificationMethods,omitempty"`
 	PromptToEnrollVerificationMethods NullableJsonInput[[]string]           `json:"promptToEnrollVerificationMethods,omitempty"`
 	DefaultVerificationMethod         NullableJsonInput[string]             `json:"defaultVerificationMethod,omitempty"`
+	ActionType                        NullableJsonInput[string]             `json:"actionType,omitempty"`
+	ActionNodes                       NullableJsonInput[[]ActionNode]       `json:"actionNodes,omitempty"`
 }
 
 type ActionConfigurationResponse struct {
@@ -28,6 +33,9 @@ type ActionConfigurationResponse struct {
 	VerificationMethods               []string           `json:"verificationMethods"`
 	PromptToEnrollVerificationMethods []string           `json:"promptToEnrollVerificationMethods"`
 	DefaultVerificationMethod         string             `json:"defaultVerificationMethod"`
+	ActionType                        string             `json:"actionType"`
+	ActionNodes                       []ActionNode       `json:"actionNodes"`
+	FlowVersion                       *int64             `json:"flowVersion"`
 }
 
 func (c Client) CreateActionConfiguration(actionConfiguration ActionConfiguration) (*ActionConfigurationResponse, int, error) {
