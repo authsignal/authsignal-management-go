@@ -132,3 +132,28 @@ func (c Client) DeleteRule(actionCode string, ruleId string) (*HttpStatusRespons
 
 	return &httpStatusResponse, statusCode, nil
 }
+
+func (c Client) ListRules(actionCode string) ([]RuleResponse, int, error) {
+	request, err := http.NewRequest("GET", fmt.Sprintf("%s/action-configurations/%s/rules", c.Host, actionCode), nil)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	body, statusCode, err := c.makeRequest(request, c.ApiSecret)
+	if err != nil {
+		return nil, statusCode, err
+	}
+
+	var rules []RuleResponse
+
+	// Numbers inside a rule's conditions have to re-marshal exactly as the API sent them.
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.UseNumber()
+
+	err = decoder.Decode(&rules)
+	if err != nil {
+		return nil, statusCode, err
+	}
+
+	return rules, statusCode, nil
+}
