@@ -77,6 +77,26 @@ GetMessageOverridesCatalog()
 
 GetTenant()
 UpdateTenant()
+
+CreateSmsAuthenticatorConfiguration()
+GetSmsAuthenticatorConfiguration()
+UpdateSmsAuthenticatorConfiguration()
+DeleteSmsAuthenticatorConfiguration()
+
+CreateEmailOtpAuthenticatorConfiguration()
+GetEmailOtpAuthenticatorConfiguration()
+UpdateEmailOtpAuthenticatorConfiguration()
+DeleteEmailOtpAuthenticatorConfiguration()
+
+CreatePasskeyAuthenticatorConfiguration()
+GetPasskeyAuthenticatorConfiguration()
+UpdatePasskeyAuthenticatorConfiguration()
+DeletePasskeyAuthenticatorConfiguration()
+
+CreatePushAuthenticatorConfiguration()
+GetPushAuthenticatorConfiguration()
+UpdatePushAuthenticatorConfiguration()
+DeletePushAuthenticatorConfiguration()
 ```
 
 ## Documentation

@@ -21,3 +21,19 @@ func (inputMap NullableJsonInput[T]) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(inputMap["isSet"])
 }
+
+type ListJsonInput[T any] struct {
+	values []T
+}
+
+func SetList[T any](values []T) *ListJsonInput[T] {
+	return &ListJsonInput[T]{values: values}
+}
+
+func (input ListJsonInput[T]) MarshalJSON() ([]byte, error) {
+	if input.values == nil {
+		return []byte("[]"), nil
+	}
+
+	return json.Marshal(input.values)
+}
