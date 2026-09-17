@@ -146,6 +146,7 @@ type SmtpEmailCredentialsResponse struct {
 type CreateEmailOtpAuthenticatorConfigurationBody struct {
 	IsActive                         *bool                                  `json:"isActive,omitempty"`
 	EmailProvider                    string                                 `json:"emailProvider"`
+	WebhookUrl                       *string                                `json:"webhookUrl,omitempty"`
 	SubmissionRateLimitConfiguration *RateLimitConfiguration                `json:"submissionRateLimitConfiguration,omitempty"`
 	SendingRateLimitConfigurations   *ListJsonInput[RateLimitConfiguration] `json:"sendingRateLimitConfigurations,omitempty"`
 	AllowedCustomEmailVariables      *ListJsonInput[string]                 `json:"allowedCustomEmailVariables,omitempty"`
@@ -160,6 +161,7 @@ type CreateEmailOtpAuthenticatorConfigurationBody struct {
 type UpdateEmailOtpAuthenticatorConfigurationBody struct {
 	IsActive                         NullableJsonInput[bool]                           `json:"isActive,omitempty"`
 	EmailProvider                    NullableJsonInput[string]                         `json:"emailProvider,omitempty"`
+	WebhookUrl                       NullableJsonInput[string]                         `json:"webhookUrl,omitempty"`
 	SubmissionRateLimitConfiguration NullableJsonInput[RateLimitConfiguration]         `json:"submissionRateLimitConfiguration,omitempty"`
 	SendingRateLimitConfigurations   NullableJsonInput[[]RateLimitConfiguration]       `json:"sendingRateLimitConfigurations,omitempty"`
 	AllowedCustomEmailVariables      *ListJsonInput[string]                            `json:"allowedCustomEmailVariables,omitempty"`
@@ -176,6 +178,7 @@ type EmailOtpAuthenticatorConfiguration struct {
 	IsActive                         bool                              `json:"isActive"`
 	VerificationMethod               string                            `json:"verificationMethod"`
 	EmailProvider                    *string                           `json:"emailProvider,omitempty"`
+	WebhookUrl                       *string                           `json:"webhookUrl,omitempty"`
 	SubmissionRateLimitConfiguration *RateLimitConfiguration           `json:"submissionRateLimitConfiguration,omitempty"`
 	SendingRateLimitConfigurations   *[]RateLimitConfiguration         `json:"sendingRateLimitConfigurations,omitempty"`
 	AllowedCustomEmailVariables      *[]string                         `json:"allowedCustomEmailVariables,omitempty"`
