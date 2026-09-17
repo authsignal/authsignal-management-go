@@ -91,6 +91,7 @@ type TnzCredentialsResponse struct{}
 type CreateSmsAuthenticatorConfigurationBody struct {
 	IsActive                         *bool                                        `json:"isActive,omitempty"`
 	SmsProvider                      string                                       `json:"smsProvider"`
+	WebhookUrl                       *string                                      `json:"webhookUrl,omitempty"`
 	SmsCountryCodes                  *ListJsonInput[string]                       `json:"smsCountryCodes,omitempty"`
 	DefaultCountryCode               *string                                      `json:"defaultCountryCode,omitempty"`
 	SubmissionRateLimitConfiguration *RateLimitConfiguration                      `json:"submissionRateLimitConfiguration,omitempty"`
@@ -107,6 +108,7 @@ type CreateSmsAuthenticatorConfigurationBody struct {
 type UpdateSmsAuthenticatorConfigurationBody struct {
 	IsActive                         NullableJsonInput[bool]                          `json:"isActive,omitempty"`
 	SmsProvider                      NullableJsonInput[string]                        `json:"smsProvider,omitempty"`
+	WebhookUrl                       NullableJsonInput[string]                        `json:"webhookUrl,omitempty"`
 	SmsCountryCodes                  *ListJsonInput[string]                           `json:"smsCountryCodes,omitempty"`
 	DefaultCountryCode               NullableJsonInput[string]                        `json:"defaultCountryCode,omitempty"`
 	SubmissionRateLimitConfiguration NullableJsonInput[RateLimitConfiguration]        `json:"submissionRateLimitConfiguration,omitempty"`
@@ -125,6 +127,7 @@ type SmsAuthenticatorConfiguration struct {
 	IsActive                         bool                             `json:"isActive"`
 	VerificationMethod               string                           `json:"verificationMethod"`
 	SmsProvider                      *string                          `json:"smsProvider,omitempty"`
+	WebhookUrl                       *string                          `json:"webhookUrl,omitempty"`
 	SmsCountryCodes                  *[]string                        `json:"smsCountryCodes,omitempty"`
 	DefaultCountryCode               *string                          `json:"defaultCountryCode,omitempty"`
 	SubmissionRateLimitConfiguration *RateLimitConfiguration          `json:"submissionRateLimitConfiguration,omitempty"`

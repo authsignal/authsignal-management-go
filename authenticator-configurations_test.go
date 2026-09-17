@@ -722,3 +722,91 @@ func TestListJsonInputZeroValueMarshalsAsEmptyList(t *testing.T) {
 		t.Fatalf("bad json. expected: %v. got: %v", expectedJson, string(jsonBody))
 	}
 }
+
+func TestSmsWebhookProviderSerialization(t *testing.T) {
+	create := CreateSmsAuthenticatorConfigurationBody{
+		SmsProvider: "WEBHOOK",
+		WebhookUrl:  ptr("https://example.com/sms"),
+	}
+
+	createJson, err := json.Marshal(create)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedCreate := "{\"smsProvider\":\"WEBHOOK\",\"webhookUrl\":\"https://example.com/sms\"}"
+	if string(createJson) != expectedCreate {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedCreate, string(createJson))
+	}
+
+	update := UpdateSmsAuthenticatorConfigurationBody{
+		SmsProvider: SetValue("WEBHOOK"),
+		WebhookUrl:  SetValue("https://example.com/replaced"),
+	}
+
+	updateJson, err := json.Marshal(update)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedUpdate := "{\"smsProvider\":\"WEBHOOK\",\"webhookUrl\":\"https://example.com/replaced\"}"
+	if string(updateJson) != expectedUpdate {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedUpdate, string(updateJson))
+	}
+}
+
+func TestEmailOtpWebhookProviderSerialization(t *testing.T) {
+	create := CreateEmailOtpAuthenticatorConfigurationBody{
+		EmailProvider: "WEBHOOK",
+		WebhookUrl:    ptr("https://example.com/email"),
+	}
+
+	createJson, err := json.Marshal(create)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedCreate := "{\"emailProvider\":\"WEBHOOK\",\"webhookUrl\":\"https://example.com/email\"}"
+	if string(createJson) != expectedCreate {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedCreate, string(createJson))
+	}
+}
+
+func TestWebhookUrlClearsOnProviderSwitch(t *testing.T) {
+	update := UpdateSmsAuthenticatorConfigurationBody{
+		SmsProvider: SetValue("TNZ"),
+		WebhookUrl:  SetNull(""),
+	}
+
+	updateJson, err := json.Marshal(update)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expected := "{\"smsProvider\":\"TNZ\",\"webhookUrl\":null}"
+	if string(updateJson) != expected {
+		t.Fatalf("bad json. expected: %v. got : %v", expected, string(updateJson))
+	}
+}
+
+func TestWebhookUrlIsReadBack(t *testing.T) {
+	var sms SmsAuthenticatorConfiguration
+
+	if err := json.Unmarshal([]byte("{\"smsProvider\":\"WEBHOOK\",\"webhookUrl\":\"https://example.com/sms\"}"), &sms); err != nil {
+		t.Fatalf("failed to unmarshal json")
+	}
+
+	if sms.WebhookUrl == nil || *sms.WebhookUrl != "https://example.com/sms" {
+		t.Fatalf("expected the sms webhook endpoint to be read back")
+	}
+
+	var email EmailOtpAuthenticatorConfiguration
+
+	if err := json.Unmarshal([]byte("{\"emailProvider\":\"WEBHOOK\",\"webhookUrl\":\"https://example.com/email\"}"), &email); err != nil {
+		t.Fatalf("failed to unmarshal json")
+	}
+
+	if email.WebhookUrl == nil || *email.WebhookUrl != "https://example.com/email" {
+		t.Fatalf("expected the email webhook endpoint to be read back")
+	}
+}
