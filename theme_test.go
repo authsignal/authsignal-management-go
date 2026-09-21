@@ -141,8 +141,8 @@ func TestSwitchesReadAbsentApartFromFalse(t *testing.T) {
 	}{
 		{name: "absent", body: "{}", expected: nil},
 		{name: "empty switch", body: "{\"links\":{},\"shadows\":{}}", expected: nil},
-		{name: "off", body: "{\"links\":{\"underline\":false},\"shadows\":{\"enabled\":false}}", expected: boolPointer(false)},
-		{name: "on", body: "{\"links\":{\"underline\":true},\"shadows\":{\"enabled\":true}}", expected: boolPointer(true)},
+		{name: "off", body: "{\"links\":{\"underline\":false},\"shadows\":{\"enabled\":false}}", expected: pointer(false)},
+		{name: "on", body: "{\"links\":{\"underline\":true},\"shadows\":{\"enabled\":true}}", expected: pointer(true)},
 	}
 
 	for _, testCase := range testCases {
@@ -153,17 +153,17 @@ func TestSwitchesReadAbsentApartFromFalse(t *testing.T) {
 				t.Fatalf("failed to unmarshal json: %v", err)
 			}
 
-			assertBoolPointer(t, "underline", theme.Links.Underline, testCase.expected)
-			assertBoolPointer(t, "shadows enabled", theme.Shadows.Enabled, testCase.expected)
+			assertPointer(t, "underline", theme.Links.Underline, testCase.expected)
+			assertPointer(t, "shadows enabled", theme.Shadows.Enabled, testCase.expected)
 		})
 	}
 }
 
-func boolPointer(value bool) *bool {
+func pointer[T any](value T) *T {
 	return &value
 }
 
-func assertBoolPointer(t *testing.T, name string, actual *bool, expected *bool) {
+func assertPointer[T comparable](t *testing.T, name string, actual *T, expected *T) {
 	t.Helper()
 
 	if expected == nil {
@@ -225,8 +225,8 @@ func TestDarkModeShadowsReadAbsentApartFromFalse(t *testing.T) {
 	}{
 		{name: "absent", body: "{\"darkMode\":{}}", expected: nil},
 		{name: "empty switch", body: "{\"darkMode\":{\"shadows\":{}}}", expected: nil},
-		{name: "off", body: "{\"darkMode\":{\"shadows\":{\"enabled\":false}}}", expected: boolPointer(false)},
-		{name: "on", body: "{\"darkMode\":{\"shadows\":{\"enabled\":true}}}", expected: boolPointer(true)},
+		{name: "off", body: "{\"darkMode\":{\"shadows\":{\"enabled\":false}}}", expected: pointer(false)},
+		{name: "on", body: "{\"darkMode\":{\"shadows\":{\"enabled\":true}}}", expected: pointer(true)},
 	}
 
 	for _, testCase := range testCases {
@@ -237,7 +237,7 @@ func TestDarkModeShadowsReadAbsentApartFromFalse(t *testing.T) {
 				t.Fatalf("failed to unmarshal json: %v", err)
 			}
 
-			assertBoolPointer(t, "dark mode shadows enabled", theme.DarkMode.Shadows.Enabled, testCase.expected)
+			assertPointer(t, "dark mode shadows enabled", theme.DarkMode.Shadows.Enabled, testCase.expected)
 		})
 	}
 }
@@ -298,6 +298,134 @@ func TestFacesCanBeClearedWithNull(t *testing.T) {
 	}
 
 	expectedJson := "{\"faces\":null}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestAxisPaddingMarshalsAlongsidePadding(t *testing.T) {
+	theme := Theme{
+		Container: SetValue(Container{
+			Padding:           SetValue(int64(8)),
+			PaddingHorizontal: SetValue(int64(24)),
+			PaddingVertical:   SetValue(int64(16)),
+		}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"padding\":8,\"paddingHorizontal\":24,\"paddingVertical\":16}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// Zero is a padding a tenant can set, so it has to reach the wire rather than read as unset.
+func TestAxisPaddingMarshalsWhenSetToZero(t *testing.T) {
+	theme := Theme{
+		Container: SetValue(Container{
+			PaddingHorizontal: SetValue(int64(0)),
+			PaddingVertical:   SetValue(int64(0)),
+		}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"paddingHorizontal\":0,\"paddingVertical\":0}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// A null clears the axis override and falls the container back to the shared padding.
+func TestAxisPaddingCanBeClearedWithNull(t *testing.T) {
+	theme := Theme{
+		Container: SetValue(Container{
+			PaddingHorizontal: SetNull(int64(0)),
+			PaddingVertical:   SetNull(int64(0)),
+		}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"paddingHorizontal\":null,\"paddingVertical\":null}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// A null clears the stored value, so an unset axis has to be absent rather than null.
+func TestAxisPaddingIsOmittedWhenUnset(t *testing.T) {
+	theme := Theme{Container: SetValue(Container{Padding: SetValue(int64(8))})}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"padding\":8}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// The API omits an axis the tenant never set, which has to read back as unset rather than as zero.
+func TestAxisPaddingReadsAbsentApartFromZero(t *testing.T) {
+	testCases := []struct {
+		name       string
+		body       string
+		horizontal *int64
+		vertical   *int64
+	}{
+		{name: "absent", body: "{}", horizontal: nil, vertical: nil},
+		{name: "empty container", body: "{\"container\":{}}", horizontal: nil, vertical: nil},
+		{name: "padding only", body: "{\"container\":{\"padding\":8}}", horizontal: nil, vertical: nil},
+		{name: "zero", body: "{\"container\":{\"paddingHorizontal\":0,\"paddingVertical\":0}}", horizontal: pointer(int64(0)), vertical: pointer(int64(0))},
+		{name: "set", body: "{\"container\":{\"paddingHorizontal\":24,\"paddingVertical\":16}}", horizontal: pointer(int64(24)), vertical: pointer(int64(16))},
+		{name: "one axis only", body: "{\"container\":{\"paddingHorizontal\":24}}", horizontal: pointer(int64(24)), vertical: nil},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			var theme ThemeResponse
+
+			if err := json.Unmarshal([]byte(testCase.body), &theme); err != nil {
+				t.Fatalf("failed to unmarshal json: %v", err)
+			}
+
+			assertPointer(t, "padding horizontal", theme.Container.PaddingHorizontal, testCase.horizontal)
+			assertPointer(t, "padding vertical", theme.Container.PaddingVertical, testCase.vertical)
+		})
+	}
+}
+
+// A per-axis override is theme-wide, so the dark mode container carries the shared padding only.
+func TestModeContainerDoesNotMarshalAxisPadding(t *testing.T) {
+	theme := Theme{
+		Container: SetValue(Container{PaddingHorizontal: SetValue(int64(24))}),
+		DarkMode:  SetValue(DarkMode{Container: SetValue(ModeContainer{Padding: SetValue(int64(8))})}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"container\":{\"paddingHorizontal\":24},\"darkMode\":{\"container\":{\"padding\":8}}}"
 
 	if string(jsonBody) != expectedJson {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
