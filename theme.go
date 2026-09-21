@@ -42,15 +42,17 @@ type Colors struct {
 	Focus                     NullableJsonInput[string] `json:"focus,omitempty"`
 }
 
-// ExitPosition sits on Container only. Where the exit control sits is theme-wide, so DarkMode takes
-// ModeContainer instead: the API rejects an exitPosition under darkMode.
+// ExitPosition and the axis paddings sit on Container only. Where the exit control sits is theme-wide,
+// so DarkMode takes ModeContainer instead: the API rejects an exitPosition under darkMode.
 type Container struct {
-	ContentAlignment NullableJsonInput[string] `json:"contentAlignment,omitempty"`
-	Padding          NullableJsonInput[int64]  `json:"padding,omitempty"`
-	LogoAlignment    NullableJsonInput[string] `json:"logoAlignment,omitempty"`
-	LogoPosition     NullableJsonInput[string] `json:"logoPosition,omitempty"`
-	LogoHeight       NullableJsonInput[int64]  `json:"logoHeight,omitempty"`
-	ExitPosition     NullableJsonInput[string] `json:"exitPosition,omitempty"`
+	ContentAlignment  NullableJsonInput[string] `json:"contentAlignment,omitempty"`
+	Padding           NullableJsonInput[int64]  `json:"padding,omitempty"`
+	PaddingHorizontal NullableJsonInput[int64]  `json:"paddingHorizontal,omitempty"`
+	PaddingVertical   NullableJsonInput[int64]  `json:"paddingVertical,omitempty"`
+	LogoAlignment     NullableJsonInput[string] `json:"logoAlignment,omitempty"`
+	LogoPosition      NullableJsonInput[string] `json:"logoPosition,omitempty"`
+	LogoHeight        NullableJsonInput[int64]  `json:"logoHeight,omitempty"`
+	ExitPosition      NullableJsonInput[string] `json:"exitPosition,omitempty"`
 }
 
 type ModeContainer struct {
@@ -186,13 +188,17 @@ type ColorsResponse struct {
 	Focus                     string `json:"focus"`
 }
 
+// Pointers on the axis paddings, because the API omits an axis the tenant never set and `0` is a
+// value they set.
 type ContainerResponse struct {
-	ContentAlignment string `json:"contentAlignment"`
-	Padding          int64  `json:"padding"`
-	LogoAlignment    string `json:"logoAlignment"`
-	LogoPosition     string `json:"logoPosition"`
-	LogoHeight       int64  `json:"logoHeight"`
-	ExitPosition     string `json:"exitPosition"`
+	ContentAlignment  string `json:"contentAlignment"`
+	Padding           int64  `json:"padding"`
+	PaddingHorizontal *int64 `json:"paddingHorizontal"`
+	PaddingVertical   *int64 `json:"paddingVertical"`
+	LogoAlignment     string `json:"logoAlignment"`
+	LogoPosition      string `json:"logoPosition"`
+	LogoHeight        int64  `json:"logoHeight"`
+	ExitPosition      string `json:"exitPosition"`
 }
 
 type ModeContainerResponse struct {
