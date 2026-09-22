@@ -105,6 +105,8 @@ type Typeface struct {
 	Faces NullableJsonInput[[]FontFace] `json:"faces,omitempty"`
 	// Deprecated: the single-url shape. Prefer Faces, which carries a weight per file.
 	FontUrl NullableJsonInput[string] `json:"fontUrl,omitempty"`
+	// SizeAdjust is an integer percentage from 67 to 150 that scales the glyphs the typeface draws.
+	SizeAdjust NullableJsonInput[int64] `json:"sizeAdjust,omitempty"`
 }
 
 // Typography sits on Theme only. A typeface is shared by both colour modes, so DarkMode has none.
@@ -219,9 +221,11 @@ type FontFaceResponse struct {
 	Weight FontWeight `json:"weight"`
 }
 
+// A pointer on the size adjust, because the API omits it when the tenant never set one.
 type TypefaceResponse struct {
-	Faces   []FontFaceResponse `json:"faces"`
-	FontUrl string             `json:"fontUrl"`
+	Faces      []FontFaceResponse `json:"faces"`
+	FontUrl    string             `json:"fontUrl"`
+	SizeAdjust *int64             `json:"sizeAdjust"`
 }
 
 type TypographyResponse struct {

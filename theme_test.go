@@ -431,3 +431,113 @@ func TestModeContainerDoesNotMarshalAxisPadding(t *testing.T) {
 		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
 	}
 }
+
+func TestSizeAdjustMarshalsOnEveryTypeface(t *testing.T) {
+	theme := Theme{
+		Typography: SetValue(Typography{
+			Text:    SetValue(Typeface{SizeAdjust: SetValue(int64(110))}),
+			Display: SetValue(Typeface{SizeAdjust: SetValue(int64(67))}),
+			Button:  SetValue(Typeface{SizeAdjust: SetValue(int64(125))}),
+		}),
+	}
+
+	jsonBody, err := json.Marshal(theme)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"typography\":{\"text\":{\"sizeAdjust\":110},\"display\":{\"sizeAdjust\":67},\"button\":{\"sizeAdjust\":125}}}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestSizeAdjustMarshalsBesideTheFaces(t *testing.T) {
+	typeface := Typeface{
+		Faces:      SetValue([]FontFace{{Url: "https://example.com/regular.woff2", Weight: "400"}}),
+		SizeAdjust: SetValue(int64(125)),
+	}
+
+	jsonBody, err := json.Marshal(typeface)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"faces\":[{\"url\":\"https://example.com/regular.woff2\",\"weight\":\"400\"}],\"sizeAdjust\":125}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+// A null clears the stored value, so an unset size adjust has to be absent rather than null.
+func TestSizeAdjustIsOmittedWhenUnset(t *testing.T) {
+	typeface := Typeface{FontUrl: SetValue("https://example.com/regular.woff2")}
+
+	jsonBody, err := json.Marshal(typeface)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"fontUrl\":\"https://example.com/regular.woff2\"}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestSizeAdjustCanBeClearedWithNull(t *testing.T) {
+	typeface := Typeface{SizeAdjust: SetNull(int64(0))}
+
+	jsonBody, err := json.Marshal(typeface)
+	if err != nil {
+		t.Fatalf("failed to marshal json")
+	}
+
+	expectedJson := "{\"sizeAdjust\":null}"
+
+	if string(jsonBody) != expectedJson {
+		t.Fatalf("bad json. expected: %v. got : %v", expectedJson, string(jsonBody))
+	}
+}
+
+func TestSizeAdjustReadsAbsentWhenTheApiOmitsIt(t *testing.T) {
+	testCases := []struct {
+		name    string
+		body    string
+		text    *int64
+		display *int64
+		button  *int64
+	}{
+		{name: "absent", body: "{}"},
+		{name: "empty typography", body: "{\"typography\":{}}"},
+		{name: "faces only", body: "{\"typography\":{\"text\":{\"faces\":[{\"url\":\"https://example.com/regular.woff2\"}]}}}"},
+		{
+			name:    "set on every typeface",
+			body:    "{\"typography\":{\"text\":{\"sizeAdjust\":110},\"display\":{\"sizeAdjust\":67},\"button\":{\"sizeAdjust\":150}}}",
+			text:    pointer(int64(110)),
+			display: pointer(int64(67)),
+			button:  pointer(int64(150)),
+		},
+		{
+			name:   "one typeface only",
+			body:   "{\"typography\":{\"button\":{\"sizeAdjust\":125}}}",
+			button: pointer(int64(125)),
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			var theme ThemeResponse
+
+			if err := json.Unmarshal([]byte(testCase.body), &theme); err != nil {
+				t.Fatalf("failed to unmarshal json: %v", err)
+			}
+
+			assertPointer(t, "text size adjust", theme.Typography.Text.SizeAdjust, testCase.text)
+			assertPointer(t, "display size adjust", theme.Typography.Display.SizeAdjust, testCase.display)
+			assertPointer(t, "button size adjust", theme.Typography.Button.SizeAdjust, testCase.button)
+		})
+	}
+}
