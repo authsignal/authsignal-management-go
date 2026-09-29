@@ -9,6 +9,7 @@ type CreatePasskeyAuthenticatorConfigurationBody struct {
 	PasskeyRegistrationHints    *ListJsonInput[string] `json:"passkeyRegistrationHints,omitempty"`
 	UserVerificationRequirement *string                `json:"userVerificationRequirement,omitempty"`
 	AuthenticatorAttachment     *string                `json:"authenticatorAttachment,omitempty"`
+	PreventRemovingLastPasskey  *bool                  `json:"preventRemovingLastPasskey,omitempty"`
 }
 
 type UpdatePasskeyAuthenticatorConfigurationBody struct {
@@ -18,6 +19,7 @@ type UpdatePasskeyAuthenticatorConfigurationBody struct {
 	PasskeyRegistrationHints    *ListJsonInput[string]    `json:"passkeyRegistrationHints,omitempty"`
 	UserVerificationRequirement NullableJsonInput[string] `json:"userVerificationRequirement,omitempty"`
 	AuthenticatorAttachment     NullableJsonInput[string] `json:"authenticatorAttachment,omitempty"`
+	PreventRemovingLastPasskey  NullableJsonInput[bool]   `json:"preventRemovingLastPasskey,omitempty"`
 }
 
 type PasskeyAuthenticatorConfiguration struct {
@@ -29,6 +31,7 @@ type PasskeyAuthenticatorConfiguration struct {
 	PasskeyRegistrationHints    *[]string `json:"passkeyRegistrationHints,omitempty"`
 	UserVerificationRequirement *string   `json:"userVerificationRequirement,omitempty"`
 	AuthenticatorAttachment     *string   `json:"authenticatorAttachment,omitempty"`
+	PreventRemovingLastPasskey  *bool     `json:"preventRemovingLastPasskey,omitempty"`
 }
 
 func (c Client) CreatePasskeyAuthenticatorConfiguration(configuration CreatePasskeyAuthenticatorConfigurationBody) (*PasskeyAuthenticatorConfiguration, int, error) {
