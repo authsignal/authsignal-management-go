@@ -32,6 +32,7 @@ type PasskeyAuthenticatorConfiguration struct {
 	UserVerificationRequirement *string   `json:"userVerificationRequirement,omitempty"`
 	AuthenticatorAttachment     *string   `json:"authenticatorAttachment,omitempty"`
 	PreventRemovingLastPasskey  *bool     `json:"preventRemovingLastPasskey,omitempty"`
+	Defaults                    Defaults  `json:"defaults,omitempty"`
 }
 
 func (c Client) CreatePasskeyAuthenticatorConfiguration(configuration CreatePasskeyAuthenticatorConfigurationBody) (*PasskeyAuthenticatorConfiguration, int, error) {

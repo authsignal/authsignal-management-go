@@ -188,6 +188,7 @@ type EmailOtpAuthenticatorConfiguration struct {
 	MandrillEmailCredentials         *MandrillEmailCredentialsResponse `json:"mandrillEmailCredentials,omitempty"`
 	SendgridEmailCredentials         *SendgridEmailCredentialsResponse `json:"sendgridEmailCredentials,omitempty"`
 	SmtpEmailCredentials             *SmtpEmailCredentialsResponse     `json:"smtpEmailCredentials,omitempty"`
+	Defaults                         Defaults                          `json:"defaults,omitempty"`
 }
 
 func (c Client) CreateEmailOtpAuthenticatorConfiguration(configuration CreateEmailOtpAuthenticatorConfigurationBody) (*EmailOtpAuthenticatorConfiguration, int, error) {

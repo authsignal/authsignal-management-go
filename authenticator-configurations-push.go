@@ -74,6 +74,7 @@ type PushAuthenticatorConfiguration struct {
 	SendingRateLimitConfigurations *[]RateLimitConfiguration `json:"sendingRateLimitConfigurations,omitempty"`
 	ApnsCredentials                *ApnsCredentialsResponse  `json:"apnsCredentials,omitempty"`
 	FcmCredentials                 *FcmCredentialsResponse   `json:"fcmCredentials,omitempty"`
+	Defaults                       Defaults                  `json:"defaults,omitempty"`
 }
 
 func (c Client) CreatePushAuthenticatorConfiguration(configuration CreatePushAuthenticatorConfigurationBody) (*PushAuthenticatorConfiguration, int, error) {
