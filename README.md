@@ -97,6 +97,11 @@ CreatePushAuthenticatorConfiguration()
 GetPushAuthenticatorConfiguration()
 UpdatePushAuthenticatorConfiguration()
 DeletePushAuthenticatorConfiguration()
+
+CreateNumberVerifyAuthenticatorConfiguration()
+GetNumberVerifyAuthenticatorConfiguration()
+UpdateNumberVerifyAuthenticatorConfiguration()
+DeleteNumberVerifyAuthenticatorConfiguration()
 ```
 
 ## Documentation
