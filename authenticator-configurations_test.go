@@ -299,6 +299,74 @@ func TestAuthenticatorConfigurationOperations(t *testing.T) {
 			expectedResponse: &HttpStatusResponse{Success: true},
 		},
 		{
+			name: "create number verify",
+			call: func(client Client) (any, int, error) {
+				return client.CreateNumberVerifyAuthenticatorConfiguration(CreateNumberVerifyAuthenticatorConfigurationBody{
+					AppId:       "app-1",
+					Environment: ptr(NumberVerifyEnvironmentSandbox),
+				})
+			},
+			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"SANDBOX"}`,
+			expectedMethod: http.MethodPost,
+			expectedPath:   "/v1/management/authenticator-configurations/number-verify",
+			expectedBody:   `{"appId":"app-1","environment":"SANDBOX"}`,
+			expectedResponse: &NumberVerifyAuthenticatorConfiguration{
+				AuthenticatorId:    "auth-5",
+				IsActive:           true,
+				VerificationMethod: "SNA",
+				AppId:              ptr("app-1"),
+				Environment:        ptr(NumberVerifyEnvironmentSandbox),
+			},
+		},
+		{
+			name: "get number verify",
+			call: func(client Client) (any, int, error) {
+				return client.GetNumberVerifyAuthenticatorConfiguration()
+			},
+			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION","region":"NA_01"}`,
+			expectedMethod: http.MethodGet,
+			expectedPath:   "/v1/management/authenticator-configurations/number-verify",
+			expectedResponse: &NumberVerifyAuthenticatorConfiguration{
+				AuthenticatorId:    "auth-5",
+				IsActive:           true,
+				VerificationMethod: "SNA",
+				AppId:              ptr("app-1"),
+				Environment:        ptr(NumberVerifyEnvironmentProduction),
+				Region:             ptr(NumberVerifyRegionNa01),
+			},
+		},
+		{
+			name: "update number verify",
+			call: func(client Client) (any, int, error) {
+				return client.UpdateNumberVerifyAuthenticatorConfiguration(UpdateNumberVerifyAuthenticatorConfigurationBody{
+					Environment: SetValue(NumberVerifyEnvironmentProduction),
+					Region:      SetValue(NumberVerifyRegionNa01),
+				})
+			},
+			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION","region":"NA_01"}`,
+			expectedMethod: http.MethodPatch,
+			expectedPath:   "/v1/management/authenticator-configurations/number-verify",
+			expectedBody:   `{"environment":"PRODUCTION","region":"NA_01"}`,
+			expectedResponse: &NumberVerifyAuthenticatorConfiguration{
+				AuthenticatorId:    "auth-5",
+				IsActive:           true,
+				VerificationMethod: "SNA",
+				AppId:              ptr("app-1"),
+				Environment:        ptr(NumberVerifyEnvironmentProduction),
+				Region:             ptr(NumberVerifyRegionNa01),
+			},
+		},
+		{
+			name: "delete number verify",
+			call: func(client Client) (any, int, error) {
+				return client.DeleteNumberVerifyAuthenticatorConfiguration()
+			},
+			responseBody:     `{"success":true}`,
+			expectedMethod:   http.MethodDelete,
+			expectedPath:     "/v1/management/authenticator-configurations/number-verify",
+			expectedResponse: &HttpStatusResponse{Success: true},
+		},
+		{
 			name: "create push",
 			call: func(client Client) (any, int, error) {
 				return client.CreatePushAuthenticatorConfiguration(CreatePushAuthenticatorConfigurationBody{

@@ -9,10 +9,20 @@ import (
 )
 
 const (
-	smsAuthenticatorConfigurationSlug      = "sms"
-	emailOtpAuthenticatorConfigurationSlug = "email-otp"
-	passkeyAuthenticatorConfigurationSlug  = "passkey"
-	pushAuthenticatorConfigurationSlug     = "push"
+	smsAuthenticatorConfigurationSlug          = "sms"
+	emailOtpAuthenticatorConfigurationSlug     = "email-otp"
+	passkeyAuthenticatorConfigurationSlug      = "passkey"
+	pushAuthenticatorConfigurationSlug         = "push"
+	numberVerifyAuthenticatorConfigurationSlug = "number-verify"
+)
+
+const (
+	NumberVerifyEnvironmentProduction = "PRODUCTION"
+	NumberVerifyEnvironmentSandbox    = "SANDBOX"
+)
+
+const (
+	NumberVerifyRegionNa01 = "NA_01"
 )
 
 const (
