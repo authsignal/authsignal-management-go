@@ -139,6 +139,7 @@ type SmsAuthenticatorConfiguration struct {
 	MessageMediaCredentials          *MessageMediaCredentialsResponse `json:"messageMediaCredentials,omitempty"`
 	ModicaGroupCredentials           *ModicaGroupCredentialsResponse  `json:"modicaGroupCredentials,omitempty"`
 	TnzCredentials                   *TnzCredentialsResponse          `json:"tnzCredentials,omitempty"`
+	Defaults                         Defaults                         `json:"defaults,omitempty"`
 }
 
 func (c Client) CreateSmsAuthenticatorConfiguration(configuration CreateSmsAuthenticatorConfigurationBody) (*SmsAuthenticatorConfiguration, int, error) {

@@ -35,6 +35,7 @@ type RuleResponse struct {
 	PromptToEnrollVerificationMethods []string  `json:"promptToEnrollVerificationMethods"`
 	DefaultVerificationMethod         string    `json:"defaultVerificationMethod"`
 	Conditions                        Condition `json:"conditions"`
+	DeletedAt                         *string   `json:"deletedAt,omitempty"`
 }
 
 func (c Client) CreateRule(actionCode string, rule Rule) (*RuleResponse, int, error) {

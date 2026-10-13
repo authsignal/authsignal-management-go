@@ -45,6 +45,7 @@ type TenantResponse struct {
 	AuthenticatorEventsWebhookConfig *AuthenticatorEventsWebhookConfigResponse `json:"authenticatorEventsWebhookConfig,omitempty"`
 	LogEventsWebhookConfig           *LogEventsWebhookConfigResponse           `json:"logEventsWebhookConfig,omitempty"`
 	IpWhitelist                      *[]string                                 `json:"ipWhitelist,omitempty"`
+	Defaults                         Defaults                                  `json:"defaults,omitempty"`
 }
 
 func (c Client) GetTenant() (*TenantResponse, int, error) {
