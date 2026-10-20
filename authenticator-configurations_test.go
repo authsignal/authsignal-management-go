@@ -212,6 +212,25 @@ func TestAuthenticatorConfigurationOperations(t *testing.T) {
 			},
 		},
 		{
+			name: "update email otp clears an optional credential member",
+			call: func(client Client) (any, int, error) {
+				return client.UpdateEmailOtpAuthenticatorConfiguration(UpdateEmailOtpAuthenticatorConfigurationBody{
+					SendgridEmailCredentials: SetValue(SendgridEmailCredentialsUpdate{ApiKey: ptr("rotated"), Clear: []string{"fromName"}}),
+				})
+			},
+			responseBody:   `{"authenticatorId":"auth-2","isActive":true,"verificationMethod":"EMAIL_OTP","emailProvider":"SENDGRID","sendgridEmailCredentials":{"templateId":"d-1","fromEmail":"a@b.com"}}`,
+			expectedMethod: http.MethodPatch,
+			expectedPath:   "/v1/management/authenticator-configurations/email-otp",
+			expectedBody:   `{"sendgridEmailCredentials":{"apiKey":"rotated","fromName":null}}`,
+			expectedResponse: &EmailOtpAuthenticatorConfiguration{
+				AuthenticatorId:          "auth-2",
+				IsActive:                 true,
+				VerificationMethod:       "EMAIL_OTP",
+				EmailProvider:            ptr(EmailOtpProviderSendgrid),
+				SendgridEmailCredentials: &SendgridEmailCredentialsResponse{TemplateId: ptr("d-1"), FromEmail: ptr("a@b.com")},
+			},
+		},
+		{
 			name: "delete email otp",
 			call: func(client Client) (any, int, error) {
 				return client.DeleteEmailOtpAuthenticatorConfiguration()
@@ -812,5 +831,229 @@ func TestWebhookUrlIsReadBack(t *testing.T) {
 
 	if email.WebhookUrl == nil || *email.WebhookUrl != "https://example.com/email" {
 		t.Fatalf("expected the email webhook endpoint to be read back")
+	}
+}
+
+func TestCredentialUpdateClearsOptionalMembers(t *testing.T) {
+	cases := []struct {
+		name         string
+		credentials  any
+		expectedJson string
+	}{
+		{
+			name:         "one member beside a member that is set",
+			credentials:  SendgridEmailCredentialsUpdate{TemplateId: ptr("d-2"), Clear: []string{"fromName"}},
+			expectedJson: `{"templateId":"d-2","fromName":null}`,
+		},
+		{
+			name:         "two members beside a member that is set",
+			credentials:  SmtpEmailCredentialsUpdate{Password: ptr("rotated"), Clear: []string{"replyTo", "replyToName"}},
+			expectedJson: `{"password":"rotated","replyTo":null,"replyToName":null}`,
+		},
+		{
+			name:         "a member named twice is sent once",
+			credentials:  SendgridEmailCredentialsUpdate{Clear: []string{"fromName", "fromName"}},
+			expectedJson: `{"fromName":null}`,
+		},
+		{
+			name:         "every bird sms optional member",
+			credentials:  BirdSmsCredentialsUpdate{Clear: []string{"channelId", "navigatorId", "projectId", "locale", "enableMessageTemplates"}},
+			expectedJson: `{"channelId":null,"navigatorId":null,"projectId":null,"locale":null,"enableMessageTemplates":null}`,
+		},
+		{
+			name:         "every message media optional member",
+			credentials:  MessageMediaCredentialsUpdate{Clear: []string{"sourceNumber"}},
+			expectedJson: `{"sourceNumber":null}`,
+		},
+		{
+			name:         "every bird email optional member",
+			credentials:  BirdEmailCredentialsUpdate{Clear: []string{"versionId", "locale", "senderEmail", "senderName"}},
+			expectedJson: `{"versionId":null,"locale":null,"senderEmail":null,"senderName":null}`,
+		},
+		{
+			name:         "every mailgun optional member",
+			credentials:  MailgunEmailCredentialsUpdate{Clear: []string{"from"}},
+			expectedJson: `{"from":null}`,
+		},
+		{
+			name:         "every smtp optional member",
+			credentials:  SmtpEmailCredentialsUpdate{Clear: []string{"fromName", "replyTo", "replyToName"}},
+			expectedJson: `{"fromName":null,"replyTo":null,"replyToName":null}`,
+		},
+		{
+			name:         "every apns optional member",
+			credentials:  ApnsCredentialsUpdate{Clear: []string{"sandbox"}},
+			expectedJson: `{"sandbox":null}`,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			jsonBody, err := json.Marshal(testCase.credentials)
+			if err != nil {
+				t.Fatalf("failed to marshal json: %v", err)
+			}
+
+			if string(jsonBody) != testCase.expectedJson {
+				t.Fatalf("bad json. expected: %v. got: %v", testCase.expectedJson, string(jsonBody))
+			}
+		})
+	}
+}
+
+func TestCredentialUpdateRejectsMembersThatCannotBeCleared(t *testing.T) {
+	cases := []struct {
+		name            string
+		credentials     any
+		expectedInError string
+	}{
+		{
+			name:            "a misspelt member",
+			credentials:     SendgridEmailCredentialsUpdate{Clear: []string{"fromname"}},
+			expectedInError: `cannot clear "fromname"`,
+		},
+		{
+			name:            "the go field name instead of the json name",
+			credentials:     SendgridEmailCredentialsUpdate{Clear: []string{"FromName"}},
+			expectedInError: `cannot clear "FromName"`,
+		},
+		{
+			name:            "a required member",
+			credentials:     SendgridEmailCredentialsUpdate{Clear: []string{"fromEmail"}},
+			expectedInError: `cannot clear "fromEmail"`,
+		},
+		{
+			name:            "an optional member of another provider",
+			credentials:     MailgunEmailCredentialsUpdate{Clear: []string{"fromName"}},
+			expectedInError: `cannot clear "fromName"`,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			_, err := json.Marshal(testCase.credentials)
+			if err == nil {
+				t.Fatalf("expected an error")
+			}
+
+			if !strings.Contains(err.Error(), testCase.expectedInError) {
+				t.Fatalf("bad error. expected it to contain: %v. got: %v", testCase.expectedInError, err.Error())
+			}
+		})
+	}
+}
+
+func TestCredentialUpdateRejectsAMemberThatIsSetAndCleared(t *testing.T) {
+	cases := []struct {
+		name        string
+		credentials any
+	}{
+		{
+			name:        "set to a value",
+			credentials: SendgridEmailCredentialsUpdate{FromName: ptr("Example"), Clear: []string{"fromName"}},
+		},
+		{
+			name:        "set to an empty string",
+			credentials: SmtpEmailCredentialsUpdate{ReplyTo: ptr(""), Clear: []string{"replyTo"}},
+		},
+		{
+			name:        "set to false",
+			credentials: ApnsCredentialsUpdate{Sandbox: ptr(false), Clear: []string{"sandbox"}},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			_, err := json.Marshal(testCase.credentials)
+			if err == nil {
+				t.Fatalf("expected an error")
+			}
+
+			if !strings.Contains(err.Error(), "also set to a value") {
+				t.Fatalf("bad error. expected it to say the member is also set. got: %v", err.Error())
+			}
+		})
+	}
+}
+
+func TestCredentialUpdateWithoutClearMarshalsAsBefore(t *testing.T) {
+	cases := []struct {
+		name         string
+		credentials  any
+		expectedJson string
+	}{
+		{
+			name:         "bird sms",
+			credentials:  BirdSmsCredentialsUpdate{AccessKey: ptr("key"), WorkspaceId: ptr("workspace-1"), ChannelId: ptr("channel-1"), NavigatorId: ptr("navigator-1"), ProjectId: ptr("project-1"), Locale: ptr("en"), EnableMessageTemplates: ptr(false)},
+			expectedJson: `{"accessKey":"key","workspaceId":"workspace-1","channelId":"channel-1","navigatorId":"navigator-1","projectId":"project-1","locale":"en","enableMessageTemplates":false}`,
+		},
+		{
+			name:         "message media",
+			credentials:  MessageMediaCredentialsUpdate{ApiKey: ptr("key"), ApiSecret: ptr("secret"), SourceNumber: ptr("+6421000000")},
+			expectedJson: `{"apiKey":"key","apiSecret":"secret","sourceNumber":"+6421000000"}`,
+		},
+		{
+			name:         "bird email",
+			credentials:  BirdEmailCredentialsUpdate{AccessKey: ptr("key"), WorkspaceId: ptr("workspace-1"), ChannelId: ptr("channel-1"), ProjectId: ptr("project-1"), VersionId: ptr("version-1"), Locale: ptr("en"), SenderEmail: ptr("security@example.com"), SenderName: ptr("Example")},
+			expectedJson: `{"accessKey":"key","workspaceId":"workspace-1","channelId":"channel-1","projectId":"project-1","versionId":"version-1","locale":"en","senderEmail":"security@example.com","senderName":"Example"}`,
+		},
+		{
+			name:         "mailgun",
+			credentials:  MailgunEmailCredentialsUpdate{ApiKey: ptr("key"), Url: ptr("https://api.mailgun.net"), TemplateName: ptr("otp"), Domain: ptr("example.com"), From: ptr("security@example.com")},
+			expectedJson: `{"apiKey":"key","url":"https://api.mailgun.net","templateName":"otp","domain":"example.com","from":"security@example.com"}`,
+		},
+		{
+			name:         "sendgrid",
+			credentials:  SendgridEmailCredentialsUpdate{ApiKey: ptr("key"), TemplateId: ptr("d-1"), FromEmail: ptr("security@example.com"), FromName: ptr("Example")},
+			expectedJson: `{"apiKey":"key","templateId":"d-1","fromEmail":"security@example.com","fromName":"Example"}`,
+		},
+		{
+			name:         "smtp",
+			credentials:  SmtpEmailCredentialsUpdate{Host: ptr("smtp.example.com"), Port: ptr(int64(587)), Secure: ptr(true), User: ptr("user"), Password: ptr("password"), From: ptr("security@example.com"), FromName: ptr("Example"), ReplyTo: ptr("support@example.com"), ReplyToName: ptr("Support")},
+			expectedJson: `{"host":"smtp.example.com","port":587,"secure":true,"user":"user","password":"password","from":"security@example.com","fromName":"Example","replyTo":"support@example.com","replyToName":"Support"}`,
+		},
+		{
+			name:         "apns",
+			credentials:  ApnsCredentialsUpdate{TeamId: ptr("team-1"), KeyId: ptr("key-1"), BundleId: ptr("com.example.app"), PrivateKey: ptr("private-key"), Sandbox: ptr(false)},
+			expectedJson: `{"teamId":"team-1","keyId":"key-1","bundleId":"com.example.app","privateKey":"private-key","sandbox":false}`,
+		},
+		{
+			name:         "an empty clear list",
+			credentials:  SendgridEmailCredentialsUpdate{FromName: ptr("Example"), Clear: []string{}},
+			expectedJson: `{"fromName":"Example"}`,
+		},
+		{
+			name:         "nothing set",
+			credentials:  SmtpEmailCredentialsUpdate{},
+			expectedJson: `{}`,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			jsonBody, err := json.Marshal(testCase.credentials)
+			if err != nil {
+				t.Fatalf("failed to marshal json: %v", err)
+			}
+
+			if string(jsonBody) != testCase.expectedJson {
+				t.Fatalf("bad json. expected: %v. got: %v", testCase.expectedJson, string(jsonBody))
+			}
+		})
+	}
+}
+
+func TestUpdateWithAnInvalidClearIsNotSent(t *testing.T) {
+	client, recorded := stubAuthsignal(t, http.StatusOK, `{}`)
+
+	_, _, err := client.UpdateSmsAuthenticatorConfiguration(UpdateSmsAuthenticatorConfigurationBody{
+		BirdSmsCredentials: SetValue(BirdSmsCredentialsUpdate{Locale: ptr("en"), Clear: []string{"locale"}}),
+	})
+	if err == nil {
+		t.Fatalf("expected an error")
+	}
+
+	if recorded.method != "" {
+		t.Fatalf("expected no request to be sent. got: %v %v", recorded.method, recorded.body)
 	}
 }

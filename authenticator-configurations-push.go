@@ -16,6 +16,15 @@ type ApnsCredentialsUpdate struct {
 	BundleId   *string `json:"bundleId,omitempty"`
 	PrivateKey *string `json:"privateKey,omitempty"`
 	Sandbox    *bool   `json:"sandbox,omitempty"`
+
+	// Clear removes optional members, named as in JSON: sandbox.
+	Clear []string `json:"-"`
+}
+
+func (credentials ApnsCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain ApnsCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "sandbox")
 }
 
 type ApnsCredentialsResponse struct {

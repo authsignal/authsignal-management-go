@@ -22,6 +22,15 @@ type BirdEmailCredentialsUpdate struct {
 	Locale      *string `json:"locale,omitempty"`
 	SenderEmail *string `json:"senderEmail,omitempty"`
 	SenderName  *string `json:"senderName,omitempty"`
+
+	// Clear removes optional members, named as in JSON: versionId, locale, senderEmail, senderName.
+	Clear []string `json:"-"`
+}
+
+func (credentials BirdEmailCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain BirdEmailCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "versionId", "locale", "senderEmail", "senderName")
 }
 
 type BirdEmailCredentialsResponse struct {
@@ -65,6 +74,15 @@ type MailgunEmailCredentialsUpdate struct {
 	TemplateName *string `json:"templateName,omitempty"`
 	Domain       *string `json:"domain,omitempty"`
 	From         *string `json:"from,omitempty"`
+
+	// Clear removes optional members, named as in JSON: from.
+	Clear []string `json:"-"`
+}
+
+func (credentials MailgunEmailCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain MailgunEmailCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "from")
 }
 
 type MailgunEmailCredentialsResponse struct {
@@ -100,6 +118,15 @@ type SendgridEmailCredentialsUpdate struct {
 	TemplateId *string `json:"templateId,omitempty"`
 	FromEmail  *string `json:"fromEmail,omitempty"`
 	FromName   *string `json:"fromName,omitempty"`
+
+	// Clear removes optional members, named as in JSON: fromName.
+	Clear []string `json:"-"`
+}
+
+func (credentials SendgridEmailCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain SendgridEmailCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "fromName")
 }
 
 type SendgridEmailCredentialsResponse struct {
@@ -130,6 +157,15 @@ type SmtpEmailCredentialsUpdate struct {
 	FromName    *string `json:"fromName,omitempty"`
 	ReplyTo     *string `json:"replyTo,omitempty"`
 	ReplyToName *string `json:"replyToName,omitempty"`
+
+	// Clear removes optional members, named as in JSON: fromName, replyTo, replyToName.
+	Clear []string `json:"-"`
+}
+
+func (credentials SmtpEmailCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain SmtpEmailCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "fromName", "replyTo", "replyToName")
 }
 
 type SmtpEmailCredentialsResponse struct {

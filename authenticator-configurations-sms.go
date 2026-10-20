@@ -37,6 +37,15 @@ type BirdSmsCredentialsUpdate struct {
 	ProjectId              *string `json:"projectId,omitempty"`
 	Locale                 *string `json:"locale,omitempty"`
 	EnableMessageTemplates *bool   `json:"enableMessageTemplates,omitempty"`
+
+	// Clear removes optional members, named as in JSON: channelId, navigatorId, projectId, locale, enableMessageTemplates.
+	Clear []string `json:"-"`
+}
+
+func (credentials BirdSmsCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain BirdSmsCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "channelId", "navigatorId", "projectId", "locale", "enableMessageTemplates")
 }
 
 type BirdSmsCredentialsResponse struct {
@@ -58,6 +67,15 @@ type MessageMediaCredentialsUpdate struct {
 	ApiKey       *string `json:"apiKey,omitempty"`
 	ApiSecret    *string `json:"apiSecret,omitempty"`
 	SourceNumber *string `json:"sourceNumber,omitempty"`
+
+	// Clear removes optional members, named as in JSON: sourceNumber.
+	Clear []string `json:"-"`
+}
+
+func (credentials MessageMediaCredentialsUpdate) MarshalJSON() ([]byte, error) {
+	type plain MessageMediaCredentialsUpdate
+
+	return marshalClearingMembers(plain(credentials), credentials.Clear, "sourceNumber")
 }
 
 type MessageMediaCredentialsResponse struct {
