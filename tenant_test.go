@@ -100,6 +100,43 @@ func TestTenantSettingsSendsOneWebhookFieldOnItsOwn(t *testing.T) {
 	assertJson(t, settings, "{\"authenticatorEventsWebhookConfig\":{\"includeCredentialPublicKey\":false}}")
 }
 
+func TestTenantSettingsSendsTheCustomVariablesAllowList(t *testing.T) {
+	settings := TenantSettings{
+		AuthenticatorEventsWebhookConfig: SetValue(AuthenticatorEventsWebhookConfig{
+			Url:                    ptr("https://example.com/events"),
+			AllowedCustomVariables: SetList([]string{"data-point-1", "data-point-2"}),
+		}),
+	}
+
+	assertJson(t, settings, "{\"authenticatorEventsWebhookConfig\":{\"url\":\"https://example.com/events\",\"allowedCustomVariables\":[\"data-point-1\",\"data-point-2\"]}}")
+}
+
+func TestTenantSettingsSendsAnEmptyCustomVariablesAllowList(t *testing.T) {
+	settings := TenantSettings{
+		AuthenticatorEventsWebhookConfig: SetValue(AuthenticatorEventsWebhookConfig{
+			Url:                    ptr("https://example.com/events"),
+			AllowedCustomVariables: SetList([]string{}),
+		}),
+	}
+
+	assertJson(t, settings, "{\"authenticatorEventsWebhookConfig\":{\"url\":\"https://example.com/events\",\"allowedCustomVariables\":[]}}")
+}
+
+func TestTenantResponseReadsTheCustomVariablesAllowList(t *testing.T) {
+	var tenant TenantResponse
+
+	body := "{\"authenticatorEventsWebhookConfig\":{\"url\":\"https://example.com/events\",\"allowedCustomVariables\":[\"data-point-1\"]}}"
+
+	if err := json.Unmarshal([]byte(body), &tenant); err != nil {
+		t.Fatalf("failed to unmarshal json")
+	}
+
+	allowed := tenant.AuthenticatorEventsWebhookConfig.AllowedCustomVariables
+	if allowed == nil || len(*allowed) != 1 || (*allowed)[0] != "data-point-1" {
+		t.Fatalf("expected the custom variables allow list to be read back, got %v", allowed)
+	}
+}
+
 func TestTenantSettingsClearsWebhookConfigurations(t *testing.T) {
 	settings := TenantSettings{
 		AuthenticatorEventsWebhookConfig: SetNull(AuthenticatorEventsWebhookConfig{}),
