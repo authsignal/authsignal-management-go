@@ -8,13 +8,15 @@ import (
 )
 
 type AuthenticatorEventsWebhookConfig struct {
-	Url                        *string `json:"url,omitempty"`
-	IncludeCredentialPublicKey *bool   `json:"includeCredentialPublicKey,omitempty"`
+	Url                        *string                `json:"url,omitempty"`
+	IncludeCredentialPublicKey *bool                  `json:"includeCredentialPublicKey,omitempty"`
+	AllowedCustomVariables     *ListJsonInput[string] `json:"allowedCustomVariables,omitempty"`
 }
 
 type AuthenticatorEventsWebhookConfigResponse struct {
-	Url                        *string `json:"url,omitempty"`
-	IncludeCredentialPublicKey *bool   `json:"includeCredentialPublicKey,omitempty"`
+	Url                        *string   `json:"url,omitempty"`
+	IncludeCredentialPublicKey *bool     `json:"includeCredentialPublicKey,omitempty"`
+	AllowedCustomVariables     *[]string `json:"allowedCustomVariables,omitempty"`
 }
 
 type LogEventsWebhookConfig struct {
