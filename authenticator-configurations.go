@@ -22,10 +22,6 @@ const (
 )
 
 const (
-	NumberVerifyRegionNa01 = "NA_01"
-)
-
-const (
 	SmsOtpProviderBird         = "BIRD"
 	SmsOtpProviderTwilio       = "TWILIO"
 	SmsOtpProviderMessageMedia = "MESSAGE_MEDIA"

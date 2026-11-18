@@ -323,7 +323,7 @@ func TestAuthenticatorConfigurationOperations(t *testing.T) {
 			call: func(client Client) (any, int, error) {
 				return client.GetNumberVerifyAuthenticatorConfiguration()
 			},
-			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION","region":"NA_01"}`,
+			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION"}`,
 			expectedMethod: http.MethodGet,
 			expectedPath:   "/v1/management/authenticator-configurations/number-verify",
 			expectedResponse: &NumberVerifyAuthenticatorConfiguration{
@@ -332,7 +332,6 @@ func TestAuthenticatorConfigurationOperations(t *testing.T) {
 				VerificationMethod: "SNA",
 				AppId:              ptr("app-1"),
 				Environment:        ptr(NumberVerifyEnvironmentProduction),
-				Region:             ptr(NumberVerifyRegionNa01),
 			},
 		},
 		{
@@ -340,20 +339,18 @@ func TestAuthenticatorConfigurationOperations(t *testing.T) {
 			call: func(client Client) (any, int, error) {
 				return client.UpdateNumberVerifyAuthenticatorConfiguration(UpdateNumberVerifyAuthenticatorConfigurationBody{
 					Environment: SetValue(NumberVerifyEnvironmentProduction),
-					Region:      SetValue(NumberVerifyRegionNa01),
 				})
 			},
-			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION","region":"NA_01"}`,
+			responseBody:   `{"authenticatorId":"auth-5","isActive":true,"verificationMethod":"SNA","appId":"app-1","environment":"PRODUCTION"}`,
 			expectedMethod: http.MethodPatch,
 			expectedPath:   "/v1/management/authenticator-configurations/number-verify",
-			expectedBody:   `{"environment":"PRODUCTION","region":"NA_01"}`,
+			expectedBody:   `{"environment":"PRODUCTION"}`,
 			expectedResponse: &NumberVerifyAuthenticatorConfiguration{
 				AuthenticatorId:    "auth-5",
 				IsActive:           true,
 				VerificationMethod: "SNA",
 				AppId:              ptr("app-1"),
 				Environment:        ptr(NumberVerifyEnvironmentProduction),
-				Region:             ptr(NumberVerifyRegionNa01),
 			},
 		},
 		{
