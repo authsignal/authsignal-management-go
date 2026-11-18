@@ -6,14 +6,12 @@ type CreateNumberVerifyAuthenticatorConfigurationBody struct {
 	IsActive    *bool   `json:"isActive,omitempty"`
 	AppId       string  `json:"appId"`
 	Environment *string `json:"environment,omitempty"`
-	Region      *string `json:"region,omitempty"`
 }
 
 type UpdateNumberVerifyAuthenticatorConfigurationBody struct {
 	IsActive    NullableJsonInput[bool]   `json:"isActive,omitempty"`
 	AppId       NullableJsonInput[string] `json:"appId,omitempty"`
 	Environment NullableJsonInput[string] `json:"environment,omitempty"`
-	Region      NullableJsonInput[string] `json:"region,omitempty"`
 }
 
 type NumberVerifyAuthenticatorConfiguration struct {
@@ -22,7 +20,6 @@ type NumberVerifyAuthenticatorConfiguration struct {
 	VerificationMethod string  `json:"verificationMethod"`
 	AppId              *string `json:"appId,omitempty"`
 	Environment        *string `json:"environment,omitempty"`
-	Region             *string `json:"region,omitempty"`
 }
 
 func (c Client) CreateNumberVerifyAuthenticatorConfiguration(configuration CreateNumberVerifyAuthenticatorConfigurationBody) (*NumberVerifyAuthenticatorConfiguration, int, error) {
